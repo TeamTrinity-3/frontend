@@ -1,35 +1,38 @@
-import { useState } from 'react'
-import { Button } from '@/components/ui/button' // shadcn 버튼
+import { NavLink, Routes, Route } from 'react-router-dom'
+import Home from '@/pages/Home'
+import Login from '@/pages/login/Login'
+import NotFound from '@/pages/NotFound'
 
 function App() {
-  const [count, setCount] = useState(0)
+  // const link = ({ isActive }: { isActive: boolean }) =>
+  //   isActive ? 'text-primary font-medium' : 'text-muted-foreground hover:text-foreground'
 
   return (
-    <main className='min-h-dvh flex items-center justify-center bg-background text-foreground'>
-      <div className='w-full max-w-md space-y-6 p-6'>
-        <header className='space-y-1'>
-          <h1 className='text-3xl font-bold'>MoFit</h1>
-          <p className='text-sm text-muted-foreground'>Vite + React + Tailwind + shadcn/ui</p>
-        </header>
+    <>
+      {/* <header className='border-b'>
+        <div className='mx-auto flex max-w-5xl items-center justify-between p-4'>
+          <NavLink to='/' className='text-xl font-bold'>
+            MoFit
+          </NavLink>
+          <nav className='flex gap-4 text-sm'>
+            <NavLink to='/' className={link}>
+              Login
+            </NavLink>
+            <NavLink to='/home' className={link}>
+              Home
+            </NavLink>
+          </nav>
+        </div>
+      </header> */}
 
-        <section className='rounded-xl border p-4 space-y-4'>
-          <p className='text-sm'>
-            count is <span className='font-semibold'>{count}</span>
-          </p>
-          <div className='flex gap-2'>
-            <Button onClick={() => setCount((c) => c + 1)}>+1</Button>
-            <Button variant='outline' onClick={() => setCount(0)}>
-              Reset
-            </Button>
-          </div>
-        </section>
-
-        <p className='text-xs text-muted-foreground'>
-          Edit <code className='rounded bg-muted px-1 py-0.5'>src/App.tsx</code> and save to test
-          HMR
-        </p>
-      </div>
-    </main>
+      <main className='mx-auto max-w-5xl px-4'>
+        <Routes>
+          <Route path='/' element={<Login />} />
+          <Route path='/home' element={<Home />} />
+          <Route path='*' element={<NotFound />} />
+        </Routes>
+      </main>
+    </>
   )
 }
 
