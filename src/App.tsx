@@ -1,6 +1,16 @@
-import { NavLink, Routes, Route } from 'react-router-dom'
-import Home from '@/pages/Home'
+import { Routes, Route } from 'react-router-dom'
 import Login from '@/pages/login/Login'
+import ResetPasswordRequest from '@/pages/login/ResetPasswordRequest'
+import ResetPasswordConfirm from '@/pages/login/ResetPasswordConfirm'
+import StepAccount from '@/pages/signup/StepAccount'
+import StepProfile from '@/pages/signup/StepProfile'
+import StepHealthInfo from '@/pages/signup/StepHealthInfo'
+import StepHealthIssue from '@/pages/signup/StepHealthIssue'
+import MarketingTerms from '@/pages/terms/MarketingTerms'
+import PrivacyTerms from '@/pages/terms/PrivacyTerms'
+import SensitiveTerms from '@/pages/terms/SensitiveTerms'
+import ServiceTerms from '@/pages/terms/ServiceTerms'
+import Home from '@/pages/Home'
 import NotFound from '@/pages/NotFound'
 
 function App() {
@@ -28,6 +38,16 @@ function App() {
       <main className='mx-auto max-w-5xl px-4'>
         <Routes>
           <Route path='/' element={<Login />} />
+          <Route path='/resetPW/request' element={<ResetPasswordRequest />} />
+          <Route path='/resetPW/confirm' element={<ResetPasswordConfirm />} />
+          <Route path='/signup/account' element={<StepAccount />} />
+          <Route path='/signup/profile' element={<StepProfile />} />
+          <Route path='/signup/health/info' element={<StepHealthInfo />} />
+          <Route path='/signup/health/issue' element={<StepHealthIssue />} />
+          <Route path='/terms/marketing' element={<MarketingTerms />} />
+          <Route path='/terms/privacy' element={<PrivacyTerms />} />
+          <Route path='/terms/sensitive' element={<SensitiveTerms />} />
+          <Route path='/terms/service' element={<ServiceTerms />} />
           <Route path='/home' element={<Home />} />
           <Route path='*' element={<NotFound />} />
         </Routes>

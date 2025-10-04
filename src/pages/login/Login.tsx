@@ -61,7 +61,7 @@ export default function Login() {
               </button>
             </div>
 
-            <a href='/forgot' className={s.forgot}>
+            <a href='/resetPW/request' className={s.forgot}>
               비밀번호를 잊어버리셨나요?
             </a>
 
@@ -99,7 +99,7 @@ export default function Login() {
         <CardFooter className='flex justify-center'>
           <p className={s.helper}>
             계정이 없으신가요?{' '}
-            <a className='text-[#468FAF]' href='/signup'>
+            <a href='/signup/account' className='text-[#468FAF]'>
               회원가입
             </a>
           </p>
