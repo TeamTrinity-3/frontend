@@ -4,7 +4,7 @@ import { s } from './StepHealthIssue.styles'
 import { Button } from '@/components/ui/button'
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar'
 import AppSidebar from '@/components/layout/AppSidebar'
-import Checklist from '@/components/common/checklist'
+import Checklist from '@/components/common/Checklist'
 import step3 from '@/assets/progress/step3.svg'
 
 export default function StepHealthIssue() {
