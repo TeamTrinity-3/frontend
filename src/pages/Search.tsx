@@ -1,16 +1,16 @@
 import { useState } from 'react'
 import { TextAlignJustify } from 'lucide-react'
-import { s } from './Home.styles'
+import { s } from './Search.styles'
 import { SidebarProvider, SidebarInset, useSidebar } from '@/components/ui/sidebar'
 import AppSidebar from '@/components/layout/AppSidebar'
 import WeekRoutines from '@/components/common/WeekRoutines'
 import TodayRoutine from '@/components/common/TodayRoutine'
 import SearchBar from '@/components/common/SearchBar'
 import SearchCategory from '@/components/common/SearchCategory'
-import Recommend from '@/components/common/Recommend'
+import SearchResult from '@/components/common/SearchResult'
 import { useBreakpoint } from '@/hooks/useBreakpoint'
 
-function HomeContent() {
+function SearchContent() {
   const [sideOpen, setSideOpen] = useState(false)
   const { setOpenMobile } = useSidebar()
 
@@ -39,6 +39,12 @@ function HomeContent() {
           <button type='button' onClick={openSidebar} className='text-[#7B7B7B] cursor-pointer'>
             <TextAlignJustify className='size-4.5' />
           </button>
+
+          <img
+            src='/src/assets/Images/profile.svg'
+            alt='프로필'
+            className='ml-auto h-9 w-9 rounded-full hidden max-[840px]:block'
+          />
         </div>
 
         {/* 상단바 오버레이 */}
@@ -64,53 +70,42 @@ function HomeContent() {
           {/* 헤더 */}
           <div className={s.header}>
             <div>
-              <h1 className={s.title}>안녕하세요, 임성은님👋</h1>
-              <p className={s.subtext}>오늘도 Fiti와 운동을 시작해볼까요?</p>
+              <h1 className={s.title}>Search Training</h1>
             </div>
             <img
               src='/src/assets/Images/profile.svg'
               alt='프로필'
-              className='mb-4 h-11 w-11 rounded-full'
+              className='h-11 w-11 rounded-full max-[840px]:hidden'
             />
-          </div>
-
-          {/* 배너 */}
-          <div>
-            <div className={s.banner}>
-              <picture>
-                {/* 모바일 배너 */}
-                <source
-                  media='(max-width: 1020px)'
-                  srcSet='/src/assets/Images/MoFit-bn-mobile.jpg'
-                />
-                {/* 웹 배너 */}
-                <img
-                  src='/src/assets/Images/MoFit-bn.jpg'
-                  alt='배너'
-                  loading='lazy'
-                  className={s.web_banner}
-                />
-              </picture>
-            </div>
           </div>
 
           {/* 검색 */}
           <div className='max-[840px]:hidden'>
             <SearchBar />
             <SearchCategory />
-            <Recommend />
+            <SearchResult />
           </div>
         </main>
 
         {/* 오른쪽 400px 패널 */}
         <aside className={s.aside}>
-          <WeekRoutines />
-          <TodayRoutine />
+          <div className='max-[840px]:hidden'>
+            <WeekRoutines />
+            <TodayRoutine />
+          </div>
 
-          <div className='hidden max-[840px]:block mt-8 max-[490px]:mt-5'>
+          <div className='hidden max-[840px]:block max-[490px]:-mt-2'>
             <SearchBar />
-            <SearchCategory />
-            <Recommend />
+            <SearchResult />
+            <div>
+              <h3
+                className='hidden max-[840px]:block -mt-2 -mb-4 text-[15px] font-semibold 
+                               max-[490px]:mt-7 max-[490px]:mb-1 max-[490px]:text-sm'
+              >
+                Category
+              </h3>
+              <SearchCategory />
+            </div>
           </div>
         </aside>
       </div>
@@ -118,13 +113,13 @@ function HomeContent() {
   )
 }
 
-export default function Home() {
+export default function Search() {
   return (
     <SidebarProvider>
       <div className='max-[1400px]:hidden'>
         <AppSidebar />
       </div>
-      <HomeContent />
+      <SearchContent />
     </SidebarProvider>
   )
 }

@@ -6,11 +6,19 @@ import StepAccount from '@/pages/signup/StepAccount'
 import StepProfile from '@/pages/signup/StepProfile'
 import StepHealthInfo from '@/pages/signup/StepHealthInfo'
 import StepHealthIssue from '@/pages/signup/StepHealthIssue'
+
+import FitnessTest from '@/pages/fitness-test/FitnessTest'
+import FitnessTestLoading from '@/pages/fitness-test/FitnessTestLoading'
+import FitnessTestResult from '@/pages/fitness-test/FitnessTestResult'
+
 import MarketingTerms from '@/pages/terms/MarketingTerms'
 import PrivacyTerms from '@/pages/terms/PrivacyTerms'
 import SensitiveTerms from '@/pages/terms/SensitiveTerms'
 import ServiceTerms from '@/pages/terms/ServiceTerms'
+
 import Home from '@/pages/Home'
+import Search from '@/pages/Search'
+
 import NotFound from '@/pages/NotFound'
 
 function App() {
@@ -44,11 +52,18 @@ function App() {
           <Route path='/signup/profile' element={<StepProfile />} />
           <Route path='/signup/health/info' element={<StepHealthInfo />} />
           <Route path='/signup/health/issue' element={<StepHealthIssue />} />
+
+          <Route path='/fitness/test' element={<FitnessTest />} />
+          <Route path='/fitness/test/loading' element={<FitnessTestLoading />} />
+          <Route path='/fitness/test/result' element={<FitnessTestResult />} />
+
           <Route path='/terms/marketing' element={<MarketingTerms />} />
           <Route path='/terms/privacy' element={<PrivacyTerms />} />
           <Route path='/terms/sensitive' element={<SensitiveTerms />} />
           <Route path='/terms/service' element={<ServiceTerms />} />
+
           <Route path='/home' element={<Home />} />
+          <Route path='/Search' element={<Search />} />
           <Route path='*' element={<NotFound />} />
         </Routes>
       </main>

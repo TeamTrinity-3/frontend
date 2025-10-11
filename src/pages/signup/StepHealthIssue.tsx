@@ -173,7 +173,7 @@ export default function StepHealthIssue() {
                   <Button
                     className={`${s.submit} min-[1100px]:hidden mb-8`}
                     type='submit'
-                    onClick={() => navigate('/signup/profile')}
+                    onClick={() => navigate('/fitness/test')}
                   >
                     다음
                   </Button>
@@ -287,7 +287,7 @@ export default function StepHealthIssue() {
                   <Button
                     className={`${s.submit} hidden min-[1100px]:block`}
                     type='submit'
-                    onClick={() => navigate('/signup/profile')}
+                    onClick={() => navigate('/fitness/test')}
                   >
                     다음
                   </Button>
