@@ -15,34 +15,20 @@ import MarketingTerms from '@/pages/terms/MarketingTerms'
 import PrivacyTerms from '@/pages/terms/PrivacyTerms'
 import SensitiveTerms from '@/pages/terms/SensitiveTerms'
 import ServiceTerms from '@/pages/terms/ServiceTerms'
+import PrivacyPolicy from '@/pages/policy/PrivacyPolicy'
 
 import Home from '@/pages/Home'
 import Search from '@/pages/Search'
+import MyPage from '@/pages/MyPage'
+import Settings from '@/pages/Settings'
+
+import RoutineRunner from '@/pages/routine/RoutineRunner'
 
 import NotFound from '@/pages/NotFound'
 
 function App() {
-  // const link = ({ isActive }: { isActive: boolean }) =>
-  //   isActive ? 'text-primary font-medium' : 'text-muted-foreground hover:text-foreground'
-
   return (
     <>
-      {/* <header className='border-b'>
-        <div className='mx-auto flex max-w-5xl items-center justify-between p-4'>
-          <NavLink to='/' className='text-xl font-bold'>
-            MoFit
-          </NavLink>
-          <nav className='flex gap-4 text-sm'>
-            <NavLink to='/' className={link}>
-              Login
-            </NavLink>
-            <NavLink to='/home' className={link}>
-              Home
-            </NavLink>
-          </nav>
-        </div>
-      </header> */}
-
       <main className='mx-auto max-w-5xl px-4'>
         <Routes>
           <Route path='/' element={<Login />} />
@@ -61,9 +47,14 @@ function App() {
           <Route path='/terms/privacy' element={<PrivacyTerms />} />
           <Route path='/terms/sensitive' element={<SensitiveTerms />} />
           <Route path='/terms/service' element={<ServiceTerms />} />
+          <Route path='/policy/privacy' element={<PrivacyPolicy />} />
 
           <Route path='/home' element={<Home />} />
-          <Route path='/Search' element={<Search />} />
+          <Route path='/search' element={<Search />} />
+          <Route path='/mypage' element={<MyPage />} />
+          <Route path='/settings' element={<Settings />} />
+
+          <Route path='/routine/today' element={<RoutineRunner />} />
           <Route path='*' element={<NotFound />} />
         </Routes>
       </main>
