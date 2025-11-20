@@ -7,13 +7,76 @@ import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar'
 import AppSidebar from '@/components/layout/AppSidebar'
 import TermsAgreement from '@/components/layout/TermsAgreement'
 import step1 from '@/assets/progress/step1.svg'
+import { useRequestEmailAuth } from '@/hooks/auth/useRequestEmailAuth'
+import { useSignupUser } from '@/hooks/signup/useSignupUser'
 
 export default function StepProfile() {
   const navigate = useNavigate()
+
   const [name, setName] = useState('')
   const [birth, setBirth] = useState('')
   const [email, setEmail] = useState('')
-  const [code, setCode] = useState('')
+  const [code, setCode] = useState('') // 사용자가 입력한 인증코드
+  const [sentCode, setSentCode] = useState<string | null>(null) // 발송된 인증코드
+  const [agree, setAgree] = useState(false)
+
+  const { mutate: requestAuthCode } = useRequestEmailAuth()
+  const { mutate: signupUser } = useSignupUser()
+
+  // 이메일 인증 요청 함수
+  const handleEmailVerification = () => {
+    const storedEmail = localStorage.getItem('loginId')
+
+    // 입력된 이메일과 저장된 이메일이 일치하는지 확인
+    if (storedEmail !== email.trim()) {
+      alert('가입하지 않은 이메일입니다.')
+      return
+    }
+
+    requestAuthCode(email, {
+      onSuccess: (authCode: string) => {
+        setSentCode(authCode)
+        alert('인증코드가 발송되었습니다.')
+      },
+      onError: () => {
+        alert('인증코드 발송에 실패했습니다. 잠시 후 다시 시도해주세요.')
+      },
+    })
+  }
+
+  // 인증 코드 확인 함수
+  const handleCodeVerification = () => {
+    if (sentCode !== code.trim()) {
+      alert('인증번호가 일치하지 않습니다.')
+      return false
+    }
+    return true
+  }
+
+  // 다음 버튼 클릭할 때 인증 코드 확인
+  const handleNext = () => {
+    if (!handleCodeVerification()) return
+
+    const storedPassword = localStorage.getItem('password')
+
+    signupUser(
+      {
+        email: email.trim(),
+        password: storedPassword as string,
+        name: name.trim(),
+      },
+      {
+        onSuccess: () => {
+          localStorage.removeItem('loginId')
+          localStorage.removeItem('password')
+          navigate('/signup/health/info')
+        },
+      },
+    )
+  }
+
+  const isValid =
+    name.trim() !== '' && birth.length === 8 && email.trim() !== '' && code.trim() !== '' && agree
 
   return (
     <SidebarProvider>
@@ -70,7 +133,7 @@ export default function StepProfile() {
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder='예) mofitrinity@gmail.com'
                       />
-                      <Button className={s.btn} type='button'>
+                      <Button className={s.btn} type='button' onClick={handleEmailVerification}>
                         인증하기
                       </Button>
                     </div>
@@ -82,7 +145,7 @@ export default function StepProfile() {
                         type='text'
                         value={code}
                         onChange={(e) => setCode(e.target.value)}
-                        placeholder='예) 19990101'
+                        placeholder='예) XXXXXX'
                       />
                     </div>
                   </section>
@@ -93,7 +156,7 @@ export default function StepProfile() {
                   <Button
                     className={`${s.submit} min-[1100px]:hidden mb-8`}
                     type='submit'
-                    onClick={() => navigate('/signup/health/info')}
+                    onClick={handleNext}
                   >
                     다음
                   </Button>
@@ -107,7 +170,7 @@ export default function StepProfile() {
                   <Button
                     className={`${s.submit} hidden min-[1100px]:block`}
                     type='submit'
-                    onClick={() => navigate('/signup/health/info')}
+                    onClick={handleNext}
                   >
                     다음
                   </Button>
