@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { s } from './Login.styles'
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -7,13 +8,65 @@ import { Eye, EyeOff } from 'lucide-react'
 import landingBg from '@/assets/Images/landing-bg.svg'
 import moFitLogo from '@/assets/Images/MoFit-lg.svg'
 import googleLogo from '@/assets/logo/google.svg'
-import kakaoLogo from '@/assets/logo/kakao.svg'
-import naverLogo from '@/assets/logo/naver.svg'
+// import kakaoLogo from '@/assets/logo/kakao.svg'
+// import naverLogo from '@/assets/logo/naver.svg'
+import { useLoginUser } from '@/hooks/auth/useLoginUser'
 
 export default function Login() {
+  const navigate = useNavigate()
+  const location = useLocation()
+
   const [email, setEmail] = useState('')
   const [pw, setPw] = useState('')
   const [showPw, setShowPw] = useState(false)
+  const login = useLoginUser()
+
+  // 일반 로그인
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault()
+
+    login.mutate(
+      { email, password: pw },
+      {
+        onSuccess: () => navigate('/home'),
+        onError: () => alert('로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.'),
+      },
+    )
+  }
+
+  // 구글 로그인/회원가입
+  const handleGoogleLogin = () => {
+    window.location.href = `${import.meta.env.VITE_API_BASE_URL}/oauth2/authorization/google`
+  }
+
+  // 소셜 로그인 리다이렉트 처리
+  useEffect(() => {
+    const params = new URLSearchParams(location.search)
+    const tempCode = params.get('code')
+    const error = params.get('error')
+
+    if (tempCode) {
+      // tempCode 떼어내기
+      localStorage.setItem('socialTempCode', tempCode)
+
+      // 이 부분에 JWT 발급 API 호출 예정
+
+      // URL 정리 (쿼리 제거)
+      navigate('/', { replace: true })
+    }
+
+    if (error) {
+      // URLSearchParams 가 이미 디코딩 해줌
+      if (error.includes('Account exists with a different login method')) {
+        alert('이미 다른 방식으로 가입한 계정입니다. 기존 로그인 방식을 사용해주세요.')
+      } else {
+        alert('소셜 로그인 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.')
+      }
+
+      // 에러 쿼리 정리
+      navigate('/', { replace: true })
+    }
+  }, [location.search, navigate])
 
   return (
     <main className={s.root}>
@@ -31,13 +84,7 @@ export default function Login() {
         </CardHeader>
 
         <CardContent>
-          <form
-            className={s.form}
-            onSubmit={(e) => {
-              e.preventDefault()
-              // TODO: submit 로직
-            }}
-          >
+          <form className={s.form} onSubmit={handleLogin}>
             <div>
               <Input
                 className={s.input}
@@ -75,22 +122,22 @@ export default function Login() {
               <p className={s.altTitle}>다른 방식으로 로그인</p>
               <div className={s.altGrid}>
                 {/* Google */}
-                <button className={s.altBtn} type='button'>
+                <button className={s.altBtn} type='button' onClick={handleGoogleLogin}>
                   <img src={googleLogo} alt='Google' className='h-7 w-7' />
                   <span className='text-sm'>Google</span>
                 </button>
 
                 {/* Kakao */}
-                <button className={s.altBtn} type='button'>
+                {/* <button className={s.altBtn} type='button'>
                   <img src={kakaoLogo} alt='Kakao' className='h-7 w-7' />
                   <span className='text-sm'>Kakao</span>
-                </button>
+                </button> */}
 
                 {/* Naver */}
-                <button className={s.altBtn} type='button'>
+                {/* <button className={s.altBtn} type='button'>
                   <img src={naverLogo} alt='Naver' className='h-7 w-7' />
                   <span className='text-sm'>Naver</span>
-                </button>
+                </button> */}
               </div>
             </div>
           </form>

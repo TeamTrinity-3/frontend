@@ -6,13 +6,64 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import landingBg from '@/assets/Images/landing-bg.svg'
 import moFitLogo from '@/assets/Images/MoFit-lg.svg'
+import { useGetEmailProvider } from '@/hooks/auth/useGetEmailProvider'
+import { useRequestEmailAuth } from '@/hooks/auth/useRequestEmailAuth'
 
 export default function ResetPasswordRequest() {
   const navigate = useNavigate()
+
   const [email, setEmail] = useState('')
   const [code, setCode] = useState('')
-  //   const [emailErr, setEmailErr] = useState<string | null>(null);
-  //   const [codeErr, setCodeErr] = useState<string | null>(null);
+  const [sentCode, setSentCode] = useState<string | null>(null) // 발송된 인증코드
+
+  const { mutate: getProvider } = useGetEmailProvider() // 로컬 회원가입인지 확인
+  const { mutate: requestAuthCode } = useRequestEmailAuth() // 인증코드 발송
+
+  // 이메일 인증 요청 함수
+  const handleCheckEmail = () => {
+    if (!email.trim()) {
+      alert('이메일을 입력해주세요.')
+      return
+    }
+
+    getProvider(email.trim(), {
+      onSuccess: (provider: any) => {
+        if (provider === 'local') {
+          // 로컬 회원가입이면 인증코드 발송
+          requestAuthCode(email.trim(), {
+            onSuccess: (authCode: string) => {
+              setSentCode(authCode)
+              alert('인증코드가 발송되었습니다.')
+            },
+            onError: () => {
+              alert('인증코드 발송에 실패했습니다. 잠시 후 다시 시도해주세요.')
+            },
+          })
+        } else if (provider === 'SNS') {
+          alert('SNS로 가입된 계정은 비밀번호를 변경할 수 없습니다.')
+        } else {
+          alert('가입되지 않은 이메일입니다.')
+        }
+      },
+    })
+  }
+
+  // 인증 코드 확인 함수
+  const handleCodeVerification = () => {
+    if (sentCode !== code.trim()) {
+      alert('인증번호가 일치하지 않습니다.')
+      return false
+    }
+    return true
+  }
+
+  // 다음 버튼 클릭할 때 인증 코드 확인
+  const handleNext = () => {
+    if (!handleCodeVerification()) return
+
+    localStorage.setItem('loginId', email.trim())
+    navigate('/resetPW/confirm')
+  }
 
   return (
     <main className={s.root}>
@@ -40,7 +91,7 @@ export default function ResetPasswordRequest() {
               onChange={(e) => setEmail(e.target.value)}
               placeholder='Email'
             />
-            <Button className={s.btn} type='button'>
+            <Button className={s.btn} type='button' onClick={handleCheckEmail}>
               인증하기
             </Button>
           </div>
@@ -54,12 +105,9 @@ export default function ResetPasswordRequest() {
               onChange={(e) => setCode(e.target.value)}
               placeholder='Code'
             />
-            <Button className={s.btn} type='button'>
-              확인
-            </Button>
           </div>
 
-          <Button className={s.submit} type='submit' onClick={() => navigate('/resetPW/confirm')}>
+          <Button className={s.submit} type='submit' onClick={handleNext}>
             다음
           </Button>
         </CardContent>

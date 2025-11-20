@@ -12,5 +12,5 @@ export const s = {
 
   btn: 'block ml-auto mt-2 mb-3 h-8.5 rounded-[5px] bg-[#468FAF] text-xs text-white hover:bg-[#357893] transition-colors cursor-pointer',
   submit:
-    'mt-12 h-10 w-full rounded-[5px] bg-[#468FAF] text-white hover:bg-[#357893] transition-colors cursor-pointer',
+    'mt-22 h-10 w-full rounded-[5px] bg-[#468FAF] text-white hover:bg-[#357893] transition-colors cursor-pointer',
 }

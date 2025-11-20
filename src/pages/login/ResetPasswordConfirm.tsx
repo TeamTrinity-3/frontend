@@ -7,13 +7,48 @@ import { Button } from '@/components/ui/button'
 import { Eye, EyeOff } from 'lucide-react'
 import landingBg from '@/assets/Images/landing-bg.svg'
 import moFitLogo from '@/assets/Images/MoFit-lg.svg'
+import { usePatchPassword } from '@/hooks/auth/usePatchPassword'
 
 export default function ResetPasswordConfirm() {
   const navigate = useNavigate()
+
   const [pw, setPw] = useState('')
   const [confirmPW, setConfirmPW] = useState('')
   const [showPw, setShowPw] = useState(false)
   const [showConfirmPW, setShowConfirmPW] = useState(false)
+
+  const { mutate: patchPw } = usePatchPassword()
+
+  // 비밀번호 입력 확인
+  const validatePassword = () => {
+    if (!pw.trim() || !confirmPW.trim()) {
+      alert('비밀번호를 입력해주세요.')
+      return false
+    }
+    if (pw !== confirmPW) {
+      alert('비밀번호가 일치하지 않습니다.')
+      return false
+    }
+    return true
+  }
+
+  // 비밀번호 변경 핸들러
+  const handlePasswordChange = () => {
+    if (!validatePassword()) return
+
+    const email = localStorage.getItem('loginId')
+
+    patchPw(
+      { email: email as string, password: pw },
+      {
+        onSuccess: () => {
+          alert('비밀번호가 변경되었습니다.')
+          localStorage.removeItem('loginId')
+          navigate('/')
+        },
+      },
+    )
+  }
 
   return (
     <main className={s.root}>
@@ -68,7 +103,7 @@ export default function ResetPasswordConfirm() {
             </div>
           </div>
 
-          <Button className={s.submit} type='submit' onClick={() => navigate('/')}>
+          <Button className={s.submit} type='submit' onClick={handlePasswordChange}>
             비밀번호 변경
           </Button>
         </CardContent>

@@ -1,10 +1,7 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 
-@custom-variant dark (&:is(.dark *));
-/* @import 'tw-animate-css'; */
-
-/* shadcn/ui 최소 토큰 + 기본 바탕 */
+/* shadcn/ui 토큰 */
 @layer base {
   :root {
     --radius: 0.5rem;
@@ -13,7 +10,7 @@
     --background: #fafafa;
     --foreground: oklch(0.145 0 0);
 
-    /* 색상 토큰 (필수 최소) */
+    /* 색상 토큰 */
     --primary: oklch(0.205 0 0);
     --primary-foreground: oklch(0.985 0 0);
     --secondary: oklch(0.97 0 0);
@@ -23,63 +20,38 @@
     --border: oklch(0.922 0 0);
     --input: oklch(0.922 0 0);
     --ring: oklch(0.708 0 0);
+
+    /* 사이드바 팔레트 */
+    --sidebar: hsl(0, 0%, 100%);
+    --sidebar-foreground: hsl(240 5.3% 26.1%);
+    --sidebar-primary: hsl(240 5.9% 10%);
+    --sidebar-primary-foreground: hsl(0 0% 98%);
+    --sidebar-accent: hsl(240 4.8% 95.9%);
+    --sidebar-accent-foreground: hsl(240 5.9% 10%);
+    --sidebar-border: hsl(220 13% 91%);
+    --sidebar-ring: hsl(217.2 91.2% 59.8%);
   }
 
+  /* 전역 기본값 */
   * {
     border-color: var(--border);
   }
+
+  /* 바탕/글꼴 기본값 */
   body {
     background-color: var(--background);
     color: var(--foreground);
-
     font-family: 'Plus Jakarta Sans', sans-serif;
   }
 }
 
-/* (선택) 다크모드: 필요해지면 아래 블록을 풀고 <html class="dark">로 토글하세요.
-@custom-variant dark (&:is(.dark *));
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.274 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.552 0 0);
-}
-*/
-
-:root {
-  --sidebar: hsl(0, 0%, 100%);
-  --sidebar-foreground: hsl(240 5.3% 26.1%);
-  --sidebar-primary: hsl(240 5.9% 10%);
-  --sidebar-primary-foreground: hsl(0 0% 98%);
-  --sidebar-accent: hsl(240 4.8% 95.9%);
-  --sidebar-accent-foreground: hsl(240 5.9% 10%);
-  --sidebar-border: hsl(220 13% 91%);
-  --sidebar-ring: hsl(217.2 91.2% 59.8%);
-}
-
-/* .dark {
-  --sidebar: hsl(240 5.9% 10%);
-  --sidebar-foreground: hsl(240 4.8% 95.9%);
-  --sidebar-primary: hsl(224.3 76.3% 48%);
-  --sidebar-primary-foreground: hsl(0 0% 100%);
-  --sidebar-accent: hsl(240 3.7% 15.9%);
-  --sidebar-accent-foreground: hsl(240 4.8% 95.9%);
-  --sidebar-border: hsl(240 3.7% 15.9%);
-  --sidebar-ring: hsl(217.2 91.2% 59.8%);
-} */
-
+/* Tailwind 토큰 매핑 */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
 
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
-
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
 
@@ -97,6 +69,7 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
+/* 전역에 기본 유틸 적용 */
 @layer base {
   * {
     @apply border-border outline-ring/50;
