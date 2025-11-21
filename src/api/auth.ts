@@ -13,6 +13,12 @@ export const requestEmailAuth = async (email: string): Promise<string> => {
   return response.data.data.authCode
 }
 
+// 구글 로그인 - 토큰 발급
+export const requestSocialAccessToken = async (tempCode: string) => {
+  const response = await api.post('/login/accessToken', { tempCode })
+  return response.data.data.token
+}
+
 // 로그인
 export const loginUser = async (email: string, password: string) => {
   try {

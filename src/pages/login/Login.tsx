@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { useNavigate, useLocation } from 'react-router-dom'
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { s } from './Login.styles'
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -14,7 +14,6 @@ import { useLoginUser } from '@/hooks/auth/useLoginUser'
 
 export default function Login() {
   const navigate = useNavigate()
-  const location = useLocation()
 
   const [email, setEmail] = useState('')
   const [pw, setPw] = useState('')
@@ -38,35 +37,6 @@ export default function Login() {
   const handleGoogleLogin = () => {
     window.location.href = `${import.meta.env.VITE_API_BASE_URL}/oauth2/authorization/google`
   }
-
-  // 소셜 로그인 리다이렉트 처리
-  useEffect(() => {
-    const params = new URLSearchParams(location.search)
-    const tempCode = params.get('code')
-    const error = params.get('error')
-
-    if (tempCode) {
-      // tempCode 떼어내기
-      localStorage.setItem('socialTempCode', tempCode)
-
-      // 이 부분에 JWT 발급 API 호출 예정
-
-      // URL 정리 (쿼리 제거)
-      navigate('/', { replace: true })
-    }
-
-    if (error) {
-      // URLSearchParams 가 이미 디코딩 해줌
-      if (error.includes('Account exists with a different login method')) {
-        alert('이미 다른 방식으로 가입한 계정입니다. 기존 로그인 방식을 사용해주세요.')
-      } else {
-        alert('소셜 로그인 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.')
-      }
-
-      // 에러 쿼리 정리
-      navigate('/', { replace: true })
-    }
-  }, [location.search, navigate])
 
   return (
     <main className={s.root}>

@@ -1,5 +1,7 @@
 import { Routes, Route } from 'react-router-dom'
 import Login from '@/pages/login/Login'
+import SocialLoginCallback from '@/pages/auth/SocialLoginCallback'
+
 import ResetPasswordRequest from '@/pages/login/ResetPasswordRequest'
 import ResetPasswordConfirm from '@/pages/login/ResetPasswordConfirm'
 import StepAccount from '@/pages/signup/StepAccount'
@@ -30,6 +32,8 @@ function App() {
     <main className='mx-auto max-w-5xl px-4'>
       <Routes>
         <Route path='/' element={<Login />} />
+        <Route path='/api/login/success' element={<SocialLoginCallback />} />
+
         <Route path='/resetPW/request' element={<ResetPasswordRequest />} />
         <Route path='/resetPW/confirm' element={<ResetPasswordConfirm />} />
         <Route path='/signup/account' element={<StepAccount />} />

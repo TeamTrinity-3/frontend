@@ -18,7 +18,7 @@ export default function StepProfile() {
   const [email, setEmail] = useState('')
   const [code, setCode] = useState('') // 사용자가 입력한 인증코드
   const [sentCode, setSentCode] = useState<string | null>(null) // 발송된 인증코드
-  const [agree, setAgree] = useState(false)
+  // const [agree, setAgree] = useState(false)
 
   const { mutate: requestAuthCode } = useRequestEmailAuth()
   const { mutate: signupUser } = useSignupUser()
@@ -75,8 +75,8 @@ export default function StepProfile() {
     )
   }
 
-  const isValid =
-    name.trim() !== '' && birth.length === 8 && email.trim() !== '' && code.trim() !== '' && agree
+  // const isValid =
+  //   name.trim() !== '' && birth.length === 8 && email.trim() !== '' && code.trim() !== '' && agree
 
   return (
     <SidebarProvider>

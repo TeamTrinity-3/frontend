@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useMemo, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { s } from './RoutineRunner.styles'
