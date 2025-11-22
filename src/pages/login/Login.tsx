@@ -50,7 +50,7 @@ export default function Login() {
 
       <Card className={s.card}>
         <CardHeader>
-          <CardTitle className={s.title}>Login</CardTitle>
+          <CardTitle className={s.title}>Loginn</CardTitle>
         </CardHeader>
 
         <CardContent>
