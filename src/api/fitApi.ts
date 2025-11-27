@@ -1,15 +1,15 @@
-// care axios 인스턴스 세팅
+// fit axios 인스턴스 세팅
 import axios from 'axios'
 
-export const careApi = axios.create({
-  baseURL: import.meta.env.VITE_API_CARE_BASE_URL,
+export const fitApi = axios.create({
+  baseURL: import.meta.env.VITE_API_FIT_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
 })
 
 // token이 있으면 Authorization 헤더에 token을 넣어줌
-careApi.interceptors.request.use(
+fitApi.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token')
     if (token && config.headers) {
@@ -21,7 +21,7 @@ careApi.interceptors.request.use(
 )
 
 // 토큰 만료되거나 유효하지 않으면 로그인으로 보내버리기
-careApi.interceptors.response.use(
+fitApi.interceptors.response.use(
   (response) => response,
   (error) => {
     const status = error.response?.status

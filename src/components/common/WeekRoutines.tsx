@@ -1,17 +1,34 @@
 import { Check } from 'lucide-react'
+import { useWeekPlan } from '@/hooks/user/useWeekPlan'
+
+type Plan = {
+  day: number
+  active: boolean
+  progress: boolean
+}
 
 export default function WeekRoutines() {
-  // 더미 데이터
-  const today = 4 // 0=Day1 … 4=Day5(오늘)
-  const done = [0, 1, 2, 3, 4] // 체크된 인덱스
+  const { data } = useWeekPlan()
+  if (!data) return null
+  const { currentDay, plans } = data
 
   // days 배열 생성
-  const days = Array.from({ length: 7 }, (_, i) => ({
-    label: `Day${i + 1}`, // Day1~Day7
-    isToday: i === today, // 오늘인지 여부
-    isDone: done.includes(i), // 출석 완료 여부
-    isFuture: i > today, // 아직 오지 않은 날짜인지 여부
-  }))
+  const days = Array.from({ length: 7 }, (_, i) => {
+    const day = i + 1
+    const plan = plans.find((p: Plan) => p.day === day)
+
+    const isActive = !!plan?.active // 날이 열렸는지 여부
+    const isDone = !!plan?.progress // 루틴 완료 여부
+    const isToday = day === currentDay // 오늘인지 여부
+    const isFuture = !isActive // 아직 오지 않은 날짜인지 여부
+
+    return {
+      label: `Day${day}`,
+      isToday,
+      isDone,
+      isFuture,
+    }
+  })
 
   return (
     <section className='rounded-[10px] bg-white p-6 mb-8 max-[490px]:mb-5'>
@@ -28,7 +45,7 @@ export default function WeekRoutines() {
               <span className='h-7 w-7 rounded-full bg-[#EFEFEF]' />
             ) : isToday ? (
               <span className='grid h-7 w-7 place-items-center rounded-full bg-[#468FAF] text-white'>
-                <Check size={15} />
+                {isDone && <Check size={15} />}
               </span>
             ) : isDone ? (
               <span className='grid h-7 w-7 place-items-center rounded-full bg-[#EFEFEF]'>

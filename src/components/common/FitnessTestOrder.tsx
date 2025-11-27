@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import type { StaminaPayload } from '@/api/stamina'
 
 type Step = { label: string; time: string; active?: boolean }
 
@@ -8,15 +9,18 @@ type Props = {
   timerDone?: boolean // 타이머가 끝났는지 여부
   onStart: () => void // 측정 시작 클릭 시 호출(부모에서 Timer 시작)
   onStepChange?: (idx: number) => void // 다음 단계로 이동할 때 호출
-  onFinish?: () => void // 테스트가 끝났을 때 호출
+  onFinish?: (result: StaminaPayload) => void // 테스트가 끝났을 때 호출
   className?: string
 }
 
 export default function FitnessTestOrder({
   steps = [
-    { label: '복식호흡', time: '00:30', active: true },
-    { label: '스쿼트', time: '00:31' },
-    { label: '플랭크', time: '00:32' },
+    { label: '플랭크', time: '03:00', active: true },
+    { label: '의자 앉았다 일어나기', time: '00:30' },
+    { label: '푸쉬업', time: '01:00' },
+    { label: 'Step 테스트', time: '01:00' },
+    { label: '허리 숙여 손끝 닿기', time: '00:00' },
+    { label: '눈 감고 한 발 서기', time: '02:00' },
   ],
   disabled = false,
   timerDone = false,
@@ -34,9 +38,10 @@ export default function FitnessTestOrder({
   const [reps, setReps] = useState<number | ''>('') // 입력 중인 횟수
   const [doneReps, setDoneReps] = useState<Record<number, number>>({}) // 단계별로 기록된 횟수
   const [finished, setFinished] = useState(false) // 마지막 단계 완료 여부
+  const [started, setStarted] = useState(false) // 해당 단계에서 측정 시작을 눌렀는지 여부
 
   const isLast = activeIdx >= steps.length - 1
-  const canGoNext = timerDone && reps !== '' && !finished
+  const canGoNext = started && timerDone && reps !== '' && !finished
 
   const handleNextStep = () => {
     if (!canGoNext) return
@@ -44,6 +49,7 @@ export default function FitnessTestOrder({
     const repsNum = Number(reps)
     setDoneReps((prev) => ({ ...prev, [activeIdx]: repsNum }))
     setReps('')
+    setStarted(false)
 
     if (isLast) {
       setFinished(true)
@@ -54,6 +60,19 @@ export default function FitnessTestOrder({
     setActiveIdx(next)
     setFinished(false)
     onStepChange?.(next)
+  }
+
+  // 측정 완료되면 payload 만들어서 넘기기
+  const handleFinish = () => {
+    const result: StaminaPayload = {
+      plank: doneReps[0] ?? 0,
+      chairSquat: doneReps[1] ?? 0,
+      pushUp: doneReps[2] ?? 0,
+      stepTest: doneReps[3] ?? 0,
+      forwardFold: doneReps[4] ?? 0,
+      balance: doneReps[5] ?? 0,
+    }
+    onFinish?.(result)
   }
 
   return (
@@ -88,7 +107,7 @@ export default function FitnessTestOrder({
               </div>
 
               <span className='text-[13px] font-medium shrink-0 whitespace-nowrap'>
-                {recorded !== undefined ? `${recorded}회` : ''}
+                {recorded !== undefined ? `${recorded}회(초)` : ''}
               </span>
             </div>
           )
@@ -97,7 +116,7 @@ export default function FitnessTestOrder({
 
       {/* 횟수 입력 */}
       <div className='mb-3'>
-        <p className='text-sm font-semibold mb-2'>시간 내에 몇 회 진행하셨나요?</p>
+        <p className='text-sm font-semibold mb-2'>시간 내에 몇 회(초) 진행하셨나요?</p>
         <div className='flex justify-end items-center gap-2'>
           <input
             type='text'
@@ -110,7 +129,7 @@ export default function FitnessTestOrder({
             }}
             className='h-6 w-11 bg-[#EFEFEF] px-1 text-[13px]'
           />
-          <span className='text-[13px] font-medium'>회</span>
+          <span className='text-[13px] font-medium'>회(초)</span>
         </div>
       </div>
 
@@ -118,7 +137,7 @@ export default function FitnessTestOrder({
       {finished ? (
         <button
           type='button'
-          onClick={onFinish}
+          onClick={handleFinish}
           className='mt-2 h-10 w-full px-6 rounded-[10px] text-[13px] text-white bg-[#468FAF] cursor-pointer'
           aria-label='체력 측정 완료'
         >
@@ -129,6 +148,7 @@ export default function FitnessTestOrder({
           type='button'
           onClick={() => {
             setFinished(false)
+            setStarted(true)
             onStart()
           }}
           disabled={disabled}

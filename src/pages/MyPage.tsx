@@ -8,6 +8,8 @@ import WeekRoutines from '@/components/common/WeekRoutines'
 import TodayRoutine from '@/components/common/TodayRoutine'
 import FitnessBoard from '@/components/common/FitnessBoard'
 import { useBreakpoint } from '@/hooks/useBreakpoint'
+import { useUserProfile } from '@/hooks/user/useUserProfile'
+import defaultProfile from '@/assets/Images/profile.svg'
 
 function MyPageContent() {
   const navigate = useNavigate()
@@ -17,6 +19,10 @@ function MyPageContent() {
 
   const isLt768 = useBreakpoint('(max-width: 767px)')
   const isLt1400 = useBreakpoint('(max-width: 1400px)')
+
+  const { data: user } = useUserProfile() // 이름, 프로필 조회
+  const userName = user?.name
+  const profileSrc = user?.picture ?? defaultProfile // 프로필 없으면 기본 이미지
 
   const openSidebar = () => {
     if (isLt768) {
@@ -44,16 +50,12 @@ function MyPageContent() {
           <div className='ml-auto hidden max-[840px]:flex items-center gap-4'>
             <button
               type='button'
-              onClick={() => navigate('/signup/health/info')}
+              onClick={() => navigate('/edit/health/info')}
               className='text-[#7B7B7B] cursor-pointer'
             >
               <Pencil className='size-4.5' />
             </button>
-            <img
-              src='/src/assets/Images/profile.svg'
-              alt='프로필'
-              className='h-9 w-9 rounded-full'
-            />
+            <img src={profileSrc} alt='프로필' className='h-9 w-9 rounded-full' />
           </div>
         </div>
 
@@ -86,16 +88,12 @@ function MyPageContent() {
             <div className='flex items-center gap-5 max-[840px]:hidden'>
               <button
                 type='button'
-                onClick={() => navigate('/signup/health/info')}
+                onClick={() => navigate('/edit/health/info')}
                 className='text-[#7B7B7B] cursor-pointer'
               >
                 <Pencil className='size-4.5' />
               </button>
-              <img
-                src='/src/assets/Images/profile.svg'
-                alt='프로필'
-                className='h-11 w-11 rounded-full'
-              />
+              <img src={profileSrc} alt='프로필' className='h-11 w-11 rounded-full' />
             </div>
           </div>
 
@@ -121,7 +119,7 @@ function MyPageContent() {
 
           {/* 체력 진단 보드 */}
           <div>
-            <h3 className={s.sub_title}>임성은 님의 체력 진단 보드</h3>
+            <h3 className={s.sub_title}>{userName} 님의 체력 진단 보드</h3>
             <FitnessBoard />
             <div className='mt-4 flex justify-end'>
               <button type='button' onClick={() => navigate('/fitness/test')} className={s.btn}>

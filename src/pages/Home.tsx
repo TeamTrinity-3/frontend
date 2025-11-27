@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { TextAlignJustify } from 'lucide-react'
 import { s } from './Home.styles'
 import { SidebarProvider, SidebarInset, useSidebar } from '@/components/ui/sidebar'
@@ -9,13 +10,34 @@ import SearchBar from '@/components/common/SearchBar'
 import SearchCategory from '@/components/common/SearchCategory'
 import Recommend from '@/components/common/Recommend'
 import { useBreakpoint } from '@/hooks/useBreakpoint'
+import { useHealthInfo } from '@/hooks/health/useHealthInfo'
+import { useUserProfile } from '@/hooks/user/useUserProfile'
+import defaultProfile from '@/assets/Images/profile.svg'
 
 function HomeContent() {
+  const navigate = useNavigate()
+
   const [sideOpen, setSideOpen] = useState(false)
   const { setOpenMobile } = useSidebar()
 
   const isLt768 = useBreakpoint('(max-width: 767px)')
   const isLt1400 = useBreakpoint('(max-width: 1400px)')
+
+  const { data: healthInfo, isLoading, isFetching } = useHealthInfo() // 건강 정보 조회
+  const { data: user } = useUserProfile() // 이름, 프로필 조회
+
+  // 구글 로그인 후 건강 정보가 없으면 입력 페이지로 이동
+  useEffect(() => {
+    if (isLoading || isFetching) return
+
+    if (healthInfo === null) {
+      alert('진단을 위해 먼저 건강 정보를 입력해주세요.')
+      navigate('/signup/health/info', { replace: true })
+    }
+  }, [healthInfo, isLoading, isFetching, navigate])
+
+  const userName = user?.name
+  const profileSrc = user?.picture ?? defaultProfile // 프로필 없으면 기본 이미지
 
   const openSidebar = () => {
     if (isLt768) {
@@ -64,14 +86,10 @@ function HomeContent() {
           {/* 헤더 */}
           <div className={s.header}>
             <div>
-              <h1 className={s.title}>안녕하세요, 임성은님👋</h1>
+              <h1 className={s.title}>안녕하세요, {userName}님👋</h1>
               <p className={s.subtext}>오늘도 Fiti와 운동을 시작해볼까요?</p>
             </div>
-            <img
-              src='/src/assets/Images/profile.svg'
-              alt='프로필'
-              className='mb-4 h-11 w-11 rounded-full'
-            />
+            <img src={profileSrc} alt='프로필' className='mb-4 h-11 w-11 rounded-full' />
           </div>
 
           {/* 배너 */}

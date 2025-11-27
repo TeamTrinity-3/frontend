@@ -9,19 +9,23 @@ import TermsAgreement from '@/components/layout/TermsAgreement'
 import step1 from '@/assets/progress/step1.svg'
 import { useRequestEmailAuth } from '@/hooks/auth/useRequestEmailAuth'
 import { useSignupUser } from '@/hooks/signup/useSignupUser'
+import { useLoginUser } from '@/hooks/auth/useLoginUser'
 
 export default function StepProfile() {
   const navigate = useNavigate()
 
   const [name, setName] = useState('')
-  const [birth, setBirth] = useState('')
   const [email, setEmail] = useState('')
   const [code, setCode] = useState('') // 사용자가 입력한 인증코드
   const [sentCode, setSentCode] = useState<string | null>(null) // 발송된 인증코드
-  // const [agree, setAgree] = useState(false)
+  const [agreeAll, setAgreeAll] = useState(false) // 약관 전체 동의 여부
 
   const { mutate: requestAuthCode } = useRequestEmailAuth()
   const { mutate: signupUser } = useSignupUser()
+  const { mutate: login } = useLoginUser()
+
+  // 모두 입력했는지 확인
+  const isValid = name.trim() !== '' && email.trim() !== '' && code.trim() !== '' && agreeAll
 
   // 이메일 인증 요청 함수
   const handleEmailVerification = () => {
@@ -53,12 +57,20 @@ export default function StepProfile() {
     return true
   }
 
-  // 다음 버튼 클릭할 때 인증 코드 확인
+  // 다음 버튼 클릭할 때
   const handleNext = () => {
+    // 1. 모두 입력 & 약관 동의 확인
+    if (!isValid) {
+      alert('모든 정보를 입력하고 약관에 모두 동의해주셔야 가입이 가능합니다.')
+      return
+    }
+
+    // 2. 인증코드 확인
     if (!handleCodeVerification()) return
 
     const storedPassword = localStorage.getItem('password')
 
+    // 3. 회원가입 후 자동 로그인
     signupUser(
       {
         email: email.trim(),
@@ -67,16 +79,20 @@ export default function StepProfile() {
       },
       {
         onSuccess: () => {
-          localStorage.removeItem('loginId')
-          localStorage.removeItem('password')
-          navigate('/signup/health/info')
+          login(
+            { email: email.trim(), password: storedPassword as string },
+            {
+              onSuccess: () => {
+                localStorage.removeItem('loginId')
+                localStorage.removeItem('password')
+                navigate('/signup/health/info')
+              },
+            },
+          )
         },
       },
     )
   }
-
-  // const isValid =
-  //   name.trim() !== '' && birth.length === 8 && email.trim() !== '' && code.trim() !== '' && agree
 
   return (
     <SidebarProvider>
@@ -111,20 +127,6 @@ export default function StepProfile() {
                     </div>
 
                     <div>
-                      <p className={s.label}>생년월일</p>
-                      <Input
-                        className={s.input}
-                        type='number'
-                        value={birth}
-                        onChange={(e) => {
-                          const value = e.target.value.slice(0, 8)
-                          setBirth(value)
-                        }}
-                        placeholder='예) 19990101'
-                      />
-                    </div>
-
-                    <div>
                       <p className={s.label}>이메일</p>
                       <Input
                         className={s.input}
@@ -150,8 +152,8 @@ export default function StepProfile() {
                     </div>
                   </section>
 
-                  <div className='py-5 min-[1100px]:hidden'>
-                    <TermsAgreement />
+                  <div className='py-7 min-[1100px]:hidden'>
+                    <TermsAgreement onChangeAllAgree={setAgreeAll} />
                   </div>
                   <Button
                     className={`${s.submit} min-[1100px]:hidden mb-8`}
@@ -164,8 +166,8 @@ export default function StepProfile() {
 
                 <div className='order-1 min-[1100px]:order-2 flex flex-col justify-between'>
                   <img src={step1} alt='회원가입 1단계' className={s.stepImg} draggable={false} />
-                  <div className='py-19 hidden min-[1100px]:block'>
-                    <TermsAgreement />
+                  <div className='py-14 hidden min-[1100px]:block'>
+                    <TermsAgreement onChangeAllAgree={setAgreeAll} />
                   </div>
                   <Button
                     className={`${s.submit} hidden min-[1100px]:block`}

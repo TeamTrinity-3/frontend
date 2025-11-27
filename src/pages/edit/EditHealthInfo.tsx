@@ -1,19 +1,32 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { s } from './StepHealthInfo.styles'
+import { s } from './EditHealthInfo.styles'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar'
 import AppSidebar from '@/components/layout/AppSidebar'
 import step2 from '@/assets/progress/step2.svg'
 import running_Fiti from '@/assets/Images/running-Fiti.svg'
+import { useHealthInfo } from '@/hooks/health/useHealthInfo'
 
-export default function StepHealthInfo() {
+export default function EditHealthInfo() {
   const navigate = useNavigate()
   const [gender, setGender] = useState('')
   const [birth, setBirth] = useState('')
   const [height, setHeight] = useState('')
   const [weight, setWeight] = useState('')
+
+  const { data: healthInfo } = useHealthInfo()
+
+  // 건강 정보 가져오기
+  useEffect(() => {
+    if (!healthInfo) return
+
+    setGender(healthInfo.gender ?? '')
+    setBirth(healthInfo.birth ?? '')
+    setHeight(String(healthInfo.height ?? ''))
+    setWeight(String(healthInfo.weight ?? ''))
+  }, [healthInfo])
 
   // 다음 버튼 클릭할 때 > 로컬스토리지에 저장 후 이동
   const handleNext = () => {
@@ -35,7 +48,7 @@ export default function StepHealthInfo() {
     }
     localStorage.setItem('healthInfo', JSON.stringify(healthInfo))
 
-    navigate('/signup/health/issue')
+    navigate('/edit/health/issue')
   }
 
   return (
@@ -54,7 +67,7 @@ export default function StepHealthInfo() {
               <div className={s.grid}>
                 <div className='order-2 min-[1100px]:order-1'>
                   <div className='mb-6 min-[1100px]:mb-10'>
-                    <p className={s.caption}>회원가입</p>
+                    <p className={s.caption}>정보수정</p>
                     <h1 className={s.title}>건강 정보 입력</h1>
                   </div>
 

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import check_on from '@/assets/icons/check-on.svg'
 import check_off from '@/assets/icons/check-off.svg'
 
@@ -7,15 +7,35 @@ type Option = { id: string; label: string }
 type ChecklistProps = {
   title?: string
   options: Option[]
+  multiple?: boolean
+  value?: string[]
   onChange?: (next: string[]) => void
 }
 
-export default function Checklist({ options, onChange }: ChecklistProps) {
-  const [selected, setSelected] = useState<string[]>([])
+export default function Checklist({ options, multiple, value, onChange }: ChecklistProps) {
+  const [internalSelected, setInternalSelected] = useState<string[]>([])
+  const selected = value ?? internalSelected
+
+  useEffect(() => {
+    if (value) {
+      setInternalSelected(value)
+    }
+  }, [value])
 
   const toggle = (id: string) => {
-    const next = selected.includes(id) ? selected.filter((v) => v !== id) : [...selected, id]
-    setSelected(next)
+    let next: string[]
+
+    if (multiple) {
+      // 다중 선택
+      next = selected.includes(id) ? selected.filter((v) => v !== id) : [...selected, id]
+    } else {
+      // 단일 선택 모드
+      next = selected.includes(id) ? [] : [id]
+    }
+
+    if (value === undefined) {
+      setInternalSelected(next)
+    }
     onChange?.(next)
   }
 
