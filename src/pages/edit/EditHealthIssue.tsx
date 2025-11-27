@@ -1,15 +1,16 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
-import { s } from './StepHealthIssue.styles'
+import { s } from './EditHealthIssue.styles'
 import { Button } from '@/components/ui/button'
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar'
 import AppSidebar from '@/components/layout/AppSidebar'
 import Checklist from '@/components/common/Checklist'
 import step3 from '@/assets/progress/step3.svg'
-import { useCreateHealthInfo } from '@/hooks/health/useCreateHealthInfo'
+import { useHealthInfo } from '@/hooks/health/useHealthInfo'
+import { useUpdateHealthInfo } from '@/hooks/health/useUpdateHealthInfo'
 
-export default function StepHealthIssue() {
+export default function EditHealthIssue() {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
 
@@ -17,7 +18,17 @@ export default function StepHealthIssue() {
   const [place, setPlace] = useState('')
   const [restrictAreas, setRestrictAreas] = useState<string[]>([])
 
-  const { mutate: createHealthInfo } = useCreateHealthInfo()
+  const { data: healthInfo } = useHealthInfo()
+  const { mutate: updateHealthInfo } = useUpdateHealthInfo()
+
+  // 건강 정보 가져오기
+  useEffect(() => {
+    if (!healthInfo) return
+
+    setProficiency(healthInfo.proficiency ?? '')
+    setPlace(healthInfo.place ?? '')
+    setRestrictAreas(healthInfo.restrictAreas ?? [])
+  }, [healthInfo])
 
   // 다음 버튼 클릭할 때
   const handleNext = () => {
@@ -39,11 +50,11 @@ export default function StepHealthIssue() {
     }
 
     // 건강 정보 입력 api 호출
-    createHealthInfo(healthIssue, {
+    updateHealthInfo(healthIssue, {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ['healthInfo'] })
         localStorage.removeItem('healthInfo')
-        navigate('/fitness/test')
+        navigate('/mypage')
       },
     })
   }
@@ -64,7 +75,7 @@ export default function StepHealthIssue() {
               <div className={s.grid}>
                 <div className='order-2 min-[1100px]:order-1'>
                   <div className='mb-6'>
-                    <p className={s.caption}>회원가입</p>
+                    <p className={s.caption}>정보수정</p>
                     <h1 className={s.title}>건강 이슈 체크</h1>
                   </div>
 
@@ -72,6 +83,7 @@ export default function StepHealthIssue() {
                     <div>
                       <p className={s.label}>1. 본인의 운동 경험 수준을 선택해주세요.</p>
                       <Checklist
+                        value={proficiency ? [proficiency] : []}
                         onChange={(values) => setProficiency(values[0] ?? '')}
                         options={[
                           { id: '입문자', label: '입문자 : 운동을 거의 해본 적 없어요' },
@@ -84,6 +96,7 @@ export default function StepHealthIssue() {
                     <div>
                       <p className={s.label}>2. 어디에서 주로 운동하실 예정인가요?</p>
                       <Checklist
+                        value={place ? [place] : []}
                         onChange={(values) => setPlace(values[0] ?? '')}
                         options={[
                           { id: '집', label: '집' },
@@ -100,6 +113,7 @@ export default function StepHealthIssue() {
                       </p>
                       <Checklist
                         multiple
+                        value={restrictAreas}
                         onChange={(values) => setRestrictAreas(values)}
                         options={[
                           { id: '목', label: '목' },
@@ -120,7 +134,7 @@ export default function StepHealthIssue() {
                     type='submit'
                     onClick={handleNext}
                   >
-                    다음
+                    완료
                   </Button>
                 </div>
 
@@ -154,7 +168,7 @@ export default function StepHealthIssue() {
                     type='submit'
                     onClick={handleNext}
                   >
-                    다음
+                    완료
                   </Button>
                 </div>
               </div>

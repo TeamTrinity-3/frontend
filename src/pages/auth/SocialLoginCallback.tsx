@@ -5,23 +5,11 @@ import { useGoogleLogin } from '@/hooks/auth/useGoogleLogin'
 export default function SocialLoginCallback() {
   const location = useLocation()
   const navigate = useNavigate()
-  const socialLogin = useGoogleLogin()
+  const { mutate } = useGoogleLogin()
 
   useEffect(() => {
     const params = new URLSearchParams(location.search)
     const tempCode = params.get('code')
-    const error = params.get('error')
-
-    // 에러 처리
-    if (error) {
-      if (error.includes('Account exists with a different login method')) {
-        alert('다른 방식으로 가입된 계정입니다. 기존 로그인 방식을 사용해주세요.')
-      } else {
-        alert('로그인 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.')
-      }
-      navigate('/', { replace: true })
-      return
-    }
 
     // tempCode가 없을 경우
     if (!tempCode) {
@@ -31,9 +19,10 @@ export default function SocialLoginCallback() {
     }
 
     // tempCode로 token 발급 요청
-    socialLogin.mutate(tempCode, {
+    mutate(tempCode, {
       onSuccess: (token) => {
-        localStorage.setItem('token', token)
+        const pureToken = token.replace(/^Bearer\s+/i, '')
+        localStorage.setItem('token', pureToken)
         navigate('/home', { replace: true })
       },
       onError: () => {
@@ -41,7 +30,7 @@ export default function SocialLoginCallback() {
         navigate('/', { replace: true })
       },
     })
-  }, [location.search, navigate, socialLogin])
+  }, [location.search, navigate, mutate])
 
   return (
     <main className='flex min-h-screen items-center justify-center'>

@@ -1,10 +1,14 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ChevronRight } from 'lucide-react'
 import check_on from '@/assets/icons/check-on.svg'
 import check_off from '@/assets/icons/check-off.svg'
 
-export default function TermsAgreement() {
+type Props = {
+  onChangeAllAgree: (value: boolean) => void
+}
+
+export default function TermsAgreement({ onChangeAllAgree }: Props) {
   const navigate = useNavigate()
 
   const [terms, setTerms] = useState([
@@ -23,7 +27,13 @@ export default function TermsAgreement() {
       checked: false,
       link: '/terms/sensitive',
     },
-    { id: 4, text: '마케팅 활용 동의', required: false, checked: false, link: '/terms/marketing' },
+    {
+      id: 4,
+      text: '개인정보 제3자 제공 동의',
+      required: true,
+      checked: false,
+      link: '/terms/third-party',
+    },
   ])
   const [agreeAll, setAgreeAll] = useState(false)
 
@@ -44,6 +54,11 @@ export default function TermsAgreement() {
     const updated = terms.map((t) => ({ ...t, checked: newAgreeAll }))
     setTerms(updated)
   }
+
+  // 모든 필수 약관 동의 여부를 부모에 전달
+  useEffect(() => {
+    onChangeAllAgree(agreeAll)
+  }, [agreeAll, onChangeAllAgree])
 
   return (
     <section>

@@ -9,6 +9,8 @@ import SearchBar from '@/components/common/SearchBar'
 import SearchCategory from '@/components/common/SearchCategory'
 import SearchResult from '@/components/common/SearchResult'
 import { useBreakpoint } from '@/hooks/useBreakpoint'
+import { useUserProfile } from '@/hooks/user/useUserProfile'
+import defaultProfile from '@/assets/Images/profile.svg'
 
 function SearchContent() {
   const [sideOpen, setSideOpen] = useState(false)
@@ -16,6 +18,9 @@ function SearchContent() {
 
   const isLt768 = useBreakpoint('(max-width: 767px)')
   const isLt1400 = useBreakpoint('(max-width: 1400px)')
+
+  const { data: user } = useUserProfile() // 이름, 프로필 조회
+  const profileSrc = user?.picture ?? defaultProfile // 프로필 없으면 기본 이미지
 
   const openSidebar = () => {
     if (isLt768) {
@@ -41,7 +46,7 @@ function SearchContent() {
           </button>
 
           <img
-            src='/src/assets/Images/profile.svg'
+            src={profileSrc}
             alt='프로필'
             className='ml-auto h-9 w-9 rounded-full hidden max-[840px]:block'
           />
@@ -73,7 +78,7 @@ function SearchContent() {
               <h1 className={s.title}>Search Training</h1>
             </div>
             <img
-              src='/src/assets/Images/profile.svg'
+              src={profileSrc}
               alt='프로필'
               className='h-11 w-11 rounded-full max-[840px]:hidden'
             />

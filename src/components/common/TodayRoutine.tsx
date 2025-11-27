@@ -2,27 +2,46 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { RefreshCw, Clock } from 'lucide-react'
 import RoutineGuideModal from '@/components/common/RoutineGuideModal'
+import { useWeekPlan } from '@/hooks/user/useWeekPlan'
+import { useTodayRoutine } from '@/hooks/user/useTodayRoutine'
+
+// listResponses 타입
+type ExerciseItem = {
+  exerciseId: number
+  sequence: number
+  exerciseName: string
+  totalSec: number
+}
+
+// 초 >> 0m 0s
+const formatDuration = (sec: number) => {
+  const min = Math.floor(sec / 60)
+  const rem = sec % 60
+  return `${min}m ${rem}s`
+}
+
+// 초 >> mm:ss
+const formatTime = (sec: number) => {
+  const min = Math.floor(sec / 60)
+  const rem = sec % 60
+  return `${String(min).padStart(2, '0')}:${String(rem).padStart(2, '0')}`
+}
 
 export default function TodayRoutine() {
   const navigate = useNavigate()
   const [openGuide, setOpenGuide] = useState(false)
 
-  // 더미 데이터
-  const steps = [
-    { label: '복식호흡', time: '03:00' },
-    { label: '스쿼트', time: '08:00' },
-    { label: '플랭크', time: '05:00' },
-    { label: '팔굽혀펴기', time: '03:50' },
-  ]
+  // 오늘 planId 가져오기
+  const { data: weekPlan } = useWeekPlan()
+  const planId = weekPlan?.plans?.[weekPlan.currentDay - 1]?.planId
 
-  // 총 소요 시간 계산
-  const totalSec = steps.reduce((sum, s) => {
-    const [m, s2] = s.time.split(':').map(Number)
-    return sum + m * 60 + s2
-  }, 0)
-  const totalMin = Math.floor(totalSec / 60)
-  const totalRem = totalSec % 60
-  const durationText = `${totalMin}m ${totalRem}s`
+  // 오늘의 루틴 불러오기
+  const { data: todayRoutine } = useTodayRoutine(planId)
+  if (!todayRoutine) return null
+
+  const { image, title, description, routineSec, listResponses: rawList } = todayRoutine
+  const listResponses = (rawList ?? []) as ExerciseItem[]
+  const durationText = formatDuration(routineSec)
 
   return (
     <>
@@ -30,17 +49,24 @@ export default function TodayRoutine() {
         {/* Today's routines + 새로고침 */}
         <div className='mb-3 flex items-center justify-between'>
           <h2 className='text-[14px] font-semibold'>Today’s routines</h2>
-          <button type='button' aria-label='refresh routines' className='cursor-pointer'>
+          <button
+            type='button'
+            aria-label='refresh routines'
+            className='cursor-pointer'
+            onClick={() => window.location.reload()}
+          >
             <RefreshCw size={16} />
           </button>
         </div>
 
         {/* 이미지 자리, h는 이미지 비율대로 되도록 수정*/}
-        <div className='h-36 max-[840px]:h-80 max-[600px]:h-36 w-full rounded-[10px] bg-[#ECEFF3] mb-4' />
+        <div className='h-36 max-[840px]:h-80 max-[600px]:h-36 w-full rounded-[10px] bg-[#ECEFF3] mb-4 overflow-hidden'>
+          {image && <img src={image} alt={title} className='h-full w-full object-cover' />}
+        </div>
 
         {/* 텍스트/아이콘 오버레이 */}
-        <div className='text-[14px] font-semibold'>코어 강화 운동</div>
-        <div className='mt-1 text-[12px] text-[#7B7B7B]'>몸의 중심을 강화할 수 있습니다</div>
+        <div className='text-[14px] font-semibold'>{title}</div>
+        <div className='mt-1 text-[12px] text-[#7B7B7B]'>{description}</div>
         <div className='mt-3 ml-1 flex items-center gap-2 text-[12px] font-semibold'>
           <Clock size={15} />
           <span>{durationText}</span>
@@ -51,21 +77,25 @@ export default function TodayRoutine() {
         {/* 진행 순서 */}
         <h3 className='text-[14px] font-semibold mb-3'>운동 진행 순서</h3>
         <ol className='space-y-2 mb-5'>
-          {steps.map((s, i) => (
-            <li
-              key={`${s.label}-${i}`}
-              className='flex items-center justify-between rounded-[10px] px-3 py-2 border bg-white border-[#ECECEC]'
-            >
-              <div className='flex items-center gap-3 font-medium'>
-                <span className='h-7 w-7 rounded-full bg-[#A8D6E5] text-[13px] font-semibold grid place-items-center'>
-                  {i + 1}
-                </span>
-                <span className='text-[13px]'>
-                  {s.label} <span className='text-[#7B7B7B]'>({s.time}) </span>
-                </span>
-              </div>
-            </li>
-          ))}
+          {listResponses
+            .slice()
+            .sort((a, b) => a.sequence - b.sequence)
+            .map((item) => (
+              <li
+                key={item.sequence}
+                className='flex items-center justify-between rounded-[10px] px-3 py-2 border bg-white border-[#ECECEC]'
+              >
+                <div className='flex items-center gap-3 font-medium'>
+                  <span className='h-7 w-7 rounded-full bg-[#A8D6E5] text-[13px] font-semibold grid place-items-center'>
+                    {item.sequence}
+                  </span>
+                  <span className='text-[13px]'>
+                    {item.exerciseName}{' '}
+                    <span className='text-[#7B7B7B]'>({formatTime(item.totalSec)})</span>
+                  </span>
+                </div>
+              </li>
+            ))}
         </ol>
 
         {/* Start 버튼 */}

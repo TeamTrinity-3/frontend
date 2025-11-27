@@ -9,11 +9,23 @@ import StepBadge from '@/components/common/StepBadge'
 import Tips from '@/components/common/Tips'
 import FitnessTestOrder from '@/components/common/FitnessTestOrder'
 import { useBreakpoint } from '@/hooks/useBreakpoint'
+import { useSaveStamina } from '@/hooks/stamina/useSaveStamina'
+import type { StaminaPayload } from '@/api/stamina'
+import {
+  speakIntro,
+  speakStepReady,
+  speakStepStart,
+  speakStepComplete,
+  type FitnessStep,
+} from '@/utils/fitnessTestTTS'
 
-const STEPS = [
-  { label: '복식호흡', time: '00:30' },
-  { label: '스쿼트', time: '00:31' },
-  { label: '플랭크', time: '00:32' },
+const STEPS: FitnessStep[] = [
+  { label: '플랭크', time: '00:05' },
+  { label: '의자 앉았다 일어나기', time: '00:05' },
+  { label: '푸쉬업', time: '00:05' },
+  { label: 'Step 테스트', time: '00:05' },
+  { label: '허리 숙여 손끝 닿기', time: '00:00' },
+  { label: '눈 감고 한 발 서기', time: '00:05' },
 ]
 
 // 문자열 -> second 변환
@@ -24,6 +36,7 @@ const timeToSec = (t: string) => {
 
 export default function FitnessTest() {
   const navigate = useNavigate()
+  const { mutate: saveStamina, isPending } = useSaveStamina()
 
   // 안내 사항 모달
   const [showGuide, setShowGuide] = useState(false)
@@ -44,12 +57,47 @@ export default function FitnessTest() {
   const current = STEPS[activeIdx] // 현재 단계
   const totalSec = useMemo(() => timeToSec(current.time), [current.time]) // 현재 단계 총 소요 시간
 
+  // 모달에서 체력 측정 시작 눌렀을 때
+  const handleModalStart = () => {
+    setShowGuide(false)
+    speakIntro(STEPS[0])
+  }
+
   // 측정 시작 핸들러
   const handleStart = () => {
     setIsCounting(true)
     setTimerDone(false)
     setStartSignal((n) => n + 1) // Timer에게 시작 신호
+    speakStepStart(activeIdx, STEPS[activeIdx])
   }
+
+  // 체력 측정 단계 바꿀 때
+  const handleStepChange = (idx: number) => {
+    setActiveIdx(idx)
+    speakStepReady(idx, STEPS[idx])
+  }
+
+  // 체력 측정 완료 후 저장
+  const handleFinish = (result: StaminaPayload) => {
+    saveStamina(result, {
+      onSuccess: () => {
+        localStorage.setItem('stamina', JSON.stringify(result))
+        navigate('/fitness/test/loading')
+      },
+      onError: () => {
+        alert('체력 측정 결과 저장에 실패했습니다. 잠시 후 다시 시도해주세요.')
+      },
+    })
+  }
+
+  // 언마운트 시 TTS 정리
+  useEffect(() => {
+    return () => {
+      if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+        window.speechSynthesis.cancel()
+      }
+    }
+  }, [])
 
   return (
     <>
@@ -57,9 +105,7 @@ export default function FitnessTest() {
       <TestGuideModal
         open={showGuide}
         onClose={() => setShowGuide(false)}
-        onStart={() => {
-          setShowGuide(false)
-        }}
+        onStart={handleModalStart}
       />
 
       <SidebarProvider>
@@ -88,6 +134,7 @@ export default function FitnessTest() {
                   onComplete={() => {
                     setIsCounting(false)
                     setTimerDone(true)
+                    speakStepComplete()
                   }}
                 />
               </div>
@@ -97,11 +144,18 @@ export default function FitnessTest() {
                 items={[
                   <>
                     <span className='font-bold max-[490px]:whitespace-nowrap'>
-                      제한 시간 동안 동작을 <span className='text-[#FF0004]'>몇 회</span> 하셨는지
-                      기억해주세요.
+                      제한 시간 동안 동작을 <span className='text-[#FF0004]'>몇 회(초)</span>{' '}
+                      하셨는지 기억해주세요.
                     </span>{' '}
                     <br className='hidden max-[490px]:block' />
                     정확히 기억하지 못하실 경우 대략적인 횟수라도 적어주세요.
+                  </>,
+                  <>
+                    <span className='font-bold max-[490px]:whitespace-nowrap'>
+                      허리 숙여 손끝 닿기 테스트 후 해당하는 숫자를 입력해주세요.
+                    </span>
+                    <br className='hidden max-[490px]:block' />
+                    무릎 위: 1, 종아리 중간: 2, 발목: 3, 발끝: 4, 발끝 이상: 5
                   </>,
                   <>
                     <span className='font-bold max-[490px]:whitespace-nowrap'>
@@ -125,11 +179,11 @@ export default function FitnessTest() {
             <aside className={s.aside}>
               <FitnessTestOrder
                 steps={STEPS}
-                disabled={isCounting}
+                disabled={isCounting || isPending}
                 timerDone={timerDone}
                 onStart={handleStart}
-                onStepChange={(idx) => setActiveIdx(idx)}
-                onFinish={() => navigate('/fitness/test/loading')}
+                onStepChange={handleStepChange}
+                onFinish={handleFinish}
               />
             </aside>
           </div>

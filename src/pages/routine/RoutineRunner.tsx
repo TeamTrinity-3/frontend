@@ -11,6 +11,8 @@ import Tips from '@/components/common/Tips'
 import RoutineRunnerOrder from '@/components/common/RoutineRunnerOrder'
 import RoutineCompleteModal from '@/components/common/RoutineCompleteModal'
 import { useBreakpoint } from '@/hooks/useBreakpoint'
+import { useUserProfile } from '@/hooks/user/useUserProfile'
+import defaultProfile from '@/assets/Images/profile.svg'
 
 const STEPS = [
   { label: '복식호흡', time: '00:20', sets: 1 },
@@ -27,6 +29,9 @@ const timeToSec = (t: string) => {
 
 export default function RoutineRunner() {
   const navigate = useNavigate()
+
+  const { data: user } = useUserProfile() // 이름, 프로필 조회
+  const profileSrc = user?.picture ?? defaultProfile // 프로필 없으면 기본 이미지
 
   const [showComplete, setShowComplete] = useState(false)
   useEffect(() => setShowComplete(true), [])
@@ -86,7 +91,7 @@ export default function RoutineRunner() {
                   <h1 className={s.title}>Today's routines</h1>
                 </div>
                 <img
-                  src='/src/assets/Images/profile.svg'
+                  src={profileSrc}
                   alt='프로필'
                   className='h-11 w-11 rounded-full max-[840px]:hidden'
                 />
