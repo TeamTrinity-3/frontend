@@ -87,7 +87,7 @@ export const speakIntro = (firstStep: FitnessStep) => {
 }
 
 // 단계 변경 시
-export const speakStepReady = (index: number, step: FitnessStep) => {
+export const speakStepReady = (step: FitnessStep) => {
   speak(STEP_SCRIPT[step.label])
 }
 
