@@ -74,7 +74,7 @@ export default function FitnessTest() {
   // 체력 측정 단계 바꿀 때
   const handleStepChange = (idx: number) => {
     setActiveIdx(idx)
-    speakStepReady(idx, STEPS[idx])
+    speakStepReady(STEPS[idx])
   }
 
   // 체력 측정 완료 후 저장
