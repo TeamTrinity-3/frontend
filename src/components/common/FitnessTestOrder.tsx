@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { StaminaPayload } from '@/api/stamina'
+import plank from '@/assets/Images/plank.png'
 
 type Step = { label: string; time: string; active?: boolean }
 
@@ -79,7 +80,7 @@ export default function FitnessTestOrder({
     <aside className={`rounded-[10px] bg-white p-6 w-full ${className}`}>
       {/* 이미지 수정 필요 */}
       <div className='relative h-36 max-[840px]:h-80 max-[600px]:h-36 w-full rounded-[10px] overflow-hidden mb-5'>
-        <img src='/src/assets/Images/plank.png' className='h-full w-full object-cover' />
+        <img src={plank} className='h-full w-full object-cover' />
       </div>
 
       <hr className='mb-4 border-t-[1.5px] border-[#ECECEC]' />
