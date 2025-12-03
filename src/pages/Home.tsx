@@ -13,6 +13,8 @@ import { useBreakpoint } from '@/hooks/useBreakpoint'
 import { useHealthInfo } from '@/hooks/health/useHealthInfo'
 import { useUserProfile } from '@/hooks/user/useUserProfile'
 import defaultProfile from '@/assets/Images/profile.svg'
+import bannerWeb from '@/assets/Images/MoFit-bn.jpg'
+import bannerMobile from '@/assets/Images/MoFit-bn-mobile.jpg'
 
 function HomeContent() {
   const navigate = useNavigate()
@@ -99,17 +101,9 @@ function HomeContent() {
             <div className={s.banner}>
               <picture>
                 {/* 모바일 배너 */}
-                <source
-                  media='(max-width: 1020px)'
-                  srcSet='/src/assets/Images/MoFit-bn-mobile.jpg'
-                />
+                <source media='(max-width: 1020px)' srcSet={bannerMobile} />
                 {/* 웹 배너 */}
-                <img
-                  src='/src/assets/Images/MoFit-bn.jpg'
-                  alt='배너'
-                  loading='lazy'
-                  className={s.web_banner}
-                />
+                <img src={bannerWeb} alt='배너' loading='lazy' className={s.web_banner} />
               </picture>
             </div>
           </div>

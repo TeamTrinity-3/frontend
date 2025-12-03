@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import Modal from '@/components/common/Modal'
 import { usePatchPlanProgress } from '@/hooks/routine/usePatchPlanProgress'
+import goodFiti from '@/assets/Images/good-Fiti.svg'
 
 type Props = {
   open: boolean
@@ -44,7 +45,7 @@ export default function RoutineCompleteModal({ open, onClose, planId }: Props) {
     <Modal open={open} onClose={onClose}>
       <div className='flex flex-col items-center p-8 mt-4'>
         <img
-          src='/src/assets/Images/good-Fiti.svg'
+          src={goodFiti}
           className='w-35 h-35 md:w-40 md:h-40 object-contain select-none'
           draggable={false}
         />
