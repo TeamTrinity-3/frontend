@@ -103,6 +103,20 @@ function SearchContent() {
             <SearchCategory setKeyword={setKeyword} />
             <SearchResult targetArea={targetArea} keyword={urlKeyword} pageSize={12} />
           </div>
+
+          <div className='hidden max-[840px]:block'>
+            <SearchBar keyword={keyword} setKeyword={setKeyword} />
+            <SearchResult targetArea={targetArea} keyword={urlKeyword} pageSize={12} />
+            <div>
+              <h3
+                className='hidden max-[840px]:block max-[840px]:mt-5 -mt-2 -mb-4 text-[15px] font-semibold 
+                               max-[490px]:mt-5 max-[490px]:mb-1 max-[490px]:text-sm'
+              >
+                Category
+              </h3>
+              <SearchCategory setKeyword={setKeyword} />
+            </div>
+          </div>
         </main>
 
         {/* 오른쪽 400px 패널 */}
@@ -110,20 +124,6 @@ function SearchContent() {
           <div className='max-[840px]:hidden'>
             <WeekRoutines />
             <TodayRoutine />
-          </div>
-
-          <div className='hidden max-[840px]:block max-[490px]:-mt-2'>
-            <SearchBar keyword={keyword} setKeyword={setKeyword} />
-            <SearchResult targetArea={targetArea} keyword={urlKeyword} pageSize={12} />
-            <div>
-              <h3
-                className='hidden max-[840px]:block -mt-2 -mb-4 text-[15px] font-semibold 
-                               max-[490px]:mt-7 max-[490px]:mb-1 max-[490px]:text-sm'
-              >
-                Category
-              </h3>
-              <SearchCategory setKeyword={setKeyword} />
-            </div>
           </div>
         </aside>
       </div>

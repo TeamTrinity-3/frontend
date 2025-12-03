@@ -63,7 +63,7 @@ export default function FitnessBoard() {
                 data={chartData}
                 cx='50%'
                 cy={isMobile ? '54%' : '50%'}
-                outerRadius={isMobile ? '85%' : '75%'}
+                outerRadius={isMobile ? '80%' : '75%'}
               >
                 <PolarGrid gridType='polygon' />
                 <PolarAngleAxis
