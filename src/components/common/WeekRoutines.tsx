@@ -3,6 +3,7 @@ import { Check } from 'lucide-react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useWeekPlan } from '@/hooks/user/useWeekPlan'
 import { useGenerateRoutine } from '@/hooks/routine/useGenerateRoutine'
+import { useHealthInfo } from '@/hooks/health/useHealthInfo'
 
 type Plan = {
   planId: number
@@ -15,6 +16,7 @@ export default function WeekRoutines() {
   const queryClient = useQueryClient()
   const { data } = useWeekPlan()
   const { mutate: generateRoutine, isPending } = useGenerateRoutine()
+  const { data: healthInfo, isLoading: healthLoading, isFetching: healthFetching } = useHealthInfo()
 
   const hasRequestedNewRoutine = useRef(false) // 새 루틴을 보냈는지 여부
 
@@ -23,6 +25,9 @@ export default function WeekRoutines() {
 
   // currentDay가 -1이면 자동으로 루틴 생성
   useEffect(() => {
+    if (healthLoading || healthFetching) return
+    if (healthInfo === null) return
+
     if (currentDay !== -1 || !data || isPending || hasRequestedNewRoutine.current) return
 
     hasRequestedNewRoutine.current = true
@@ -37,7 +42,16 @@ export default function WeekRoutines() {
         alert('루틴 생성 중 오류가 발생했어요. 잠시 후 다시 시도해주세요.')
       },
     })
-  }, [currentDay, data, isPending, generateRoutine, queryClient])
+  }, [
+    currentDay,
+    data,
+    isPending,
+    healthInfo,
+    healthLoading,
+    healthFetching,
+    generateRoutine,
+    queryClient,
+  ])
 
   if (!data) return null
 
