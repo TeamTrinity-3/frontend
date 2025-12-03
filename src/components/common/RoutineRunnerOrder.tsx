@@ -9,9 +9,12 @@ type Props = {
   onStop?: () => void // 그만할래요 버튼
   onFinish?: () => void // 루틴이 끝났을 때 호출
   className?: string
+  image?: string | null
+  title?: string
+  description?: string
 }
 
-// 숫자를 두자리로 바꾸고, 초로 변환
+// 숫자를 두자리로 바꾸고 초로 변환
 const pad2 = (n: number) => String(n).padStart(2, '0')
 const timeToSec = (t: string) => {
   const [m, s] = t.split(':').map(Number)
@@ -24,6 +27,9 @@ export default function RoutineRunnerOrder({
   onStop,
   onFinish,
   className = '',
+  image,
+  title,
+  description,
 }: Props) {
   // 항상 0번부터 시작
   const rawActive = typeof activeIndex === 'number' ? activeIndex : 0
@@ -36,7 +42,7 @@ export default function RoutineRunnerOrder({
     () => steps.reduce((sum, s) => sum + timeToSec(s.time) * (s.sets ?? 1), 0),
     [steps],
   )
-  const totalText = `${Math.floor(totalSec / 60)}m${pad2(totalSec % 60)}s`
+  const totalText = `${Math.floor(totalSec / 60)}m ${pad2(totalSec % 60)}s`
 
   // 루틴이 끝나면 onFinish 호출
   const calledRef = useRef(false)
@@ -50,12 +56,14 @@ export default function RoutineRunnerOrder({
 
   return (
     <aside className={`rounded-[10px] bg-white p-6 w-full ${className}`}>
-      {/* 이미지 자리, h는 이미지 비율대로 되도록 수정*/}
-      <div className='h-36 max-[840px]:h-80 max-[600px]:h-36 w-full rounded-[10px] bg-[#ECEFF3] mb-4' />
+      {/* 이미지 */}
+      <div className='h-36 max-[840px]:h-80 max-[600px]:h-36 w-full rounded-[10px] bg-[#ECEFF3] mb-4 overflow-hidden'>
+        {image && <img src={image} alt={title} className='h-full w-full object-cover' />}
+      </div>
 
       {/* 텍스트/아이콘 오버레이 */}
-      <div className='text-[14px] font-semibold'>코어 강화 운동</div>
-      <div className='mt-1 text-[12px] text-[#7B7B7B]'>몸의 중심을 강화할 수 있습니다</div>
+      <div className='text-[14px] font-semibold'>{title}</div>
+      <div className='mt-1 text-[12px] text-[#7B7B7B]'>{description}</div>
       <div className='mt-3 ml-1 flex items-center gap-2 text-[12px] font-semibold'>
         <Clock size={15} />
         <span>{totalText}</span>

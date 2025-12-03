@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { s } from './ResetPasswordRequest.styles'
+import { Loader2 } from 'lucide-react'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -17,7 +18,7 @@ export default function ResetPasswordRequest() {
   const [sentCode, setSentCode] = useState<string | null>(null) // 발송된 인증코드
 
   const { mutate: getProvider } = useGetEmailProvider() // 로컬 회원가입인지 확인
-  const { mutate: requestAuthCode } = useRequestEmailAuth() // 인증코드 발송
+  const { mutate: requestAuthCode, isPending } = useRequestEmailAuth() // 인증코드 발송
 
   // 이메일 인증 요청 함수
   const handleCheckEmail = () => {
@@ -91,8 +92,15 @@ export default function ResetPasswordRequest() {
               onChange={(e) => setEmail(e.target.value)}
               placeholder='Email'
             />
-            <Button className={s.btn} type='button' onClick={handleCheckEmail}>
-              인증하기
+            <Button className={s.btn} type='button' onClick={handleCheckEmail} disabled={isPending}>
+              {isPending ? (
+                <span className='flex items-center gap-2'>
+                  <Loader2 className='animate-spin size-4' />
+                  전송중...
+                </span>
+              ) : (
+                '인증하기'
+              )}
             </Button>
           </div>
 

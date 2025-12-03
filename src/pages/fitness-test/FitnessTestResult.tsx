@@ -8,8 +8,10 @@ import {
 } from 'recharts'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useEffect, useMemo } from 'react'
+import { Loader2 } from 'lucide-react'
 import { useBreakpoint } from '@/hooks/useBreakpoint'
 import { useUserProfile } from '@/hooks/user/useUserProfile'
+import { useGenerateRoutine } from '@/hooks/routine/useGenerateRoutine'
 
 export default function FitnessTestResult() {
   const navigate = useNavigate()
@@ -18,6 +20,8 @@ export default function FitnessTestResult() {
 
   const { data: user } = useUserProfile() // 이름, 프로필 조회
   const userName = user?.name
+
+  const { mutate: generateRoutine, isPending } = useGenerateRoutine()
 
   const result = location.state as
     | {
@@ -77,6 +81,14 @@ export default function FitnessTestResult() {
   // LLM 리포트 문단 나누기
   const reportParagraphs = llm_report.split('\n').filter((p) => p.trim().length > 0)
 
+  const handleStart = () => {
+    generateRoutine(undefined, {
+      onSuccess: () => {
+        navigate('/home')
+      },
+    })
+  }
+
   return (
     <main className='min-h-svh px-2 py-8 md:px-5 md:py-30 xl:py-35'>
       <div className='mx-auto max-w-5xl'>
@@ -95,7 +107,7 @@ export default function FitnessTestResult() {
                   data={chartData}
                   cx='50%'
                   cy={isMobile ? '54%' : '50%'}
-                  outerRadius={isMobile ? '85%' : '75%'}
+                  outerRadius={isMobile ? '80%' : '75%'}
                 >
                   <PolarGrid gridType='polygon' />
                   <PolarAngleAxis
@@ -139,10 +151,18 @@ export default function FitnessTestResult() {
             <div className='mt-7 flex justify-end lg:mt-10'>
               <button
                 type='button'
-                onClick={() => navigate('/home')}
+                onClick={handleStart}
+                disabled={isPending}
                 className='px-5 py-2.5 rounded-[10px] font-medium text-[12px] md:text-[13px] text-white bg-[#468FAF] cursor-pointer'
               >
-                MoFit 시작하기
+                {isPending ? (
+                  <span className='flex items-center gap-2'>
+                    <Loader2 size={18} className='animate-spin' />
+                    루틴 생성중...
+                  </span>
+                ) : (
+                  'MoFit 시작하기'
+                )}
               </button>
             </div>
           </article>

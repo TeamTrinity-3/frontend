@@ -1,5 +1,7 @@
 import { useNavigate } from 'react-router-dom'
+import { Loader2 } from 'lucide-react'
 import Modal from '@/components/common/Modal'
+import { useGenerateRoutine } from '@/hooks/routine/useGenerateRoutine'
 
 type Props = {
   open: boolean
@@ -9,6 +11,8 @@ type Props = {
 
 export default function TestGuideModal({ open, onClose, onStart }: Props) {
   const navigate = useNavigate()
+
+  const { mutate: generateRoutine, isPending } = useGenerateRoutine() // 7일치 루틴 생성
 
   const items = [
     '체력 측정은 약 15~20분 소요됩니다.',
@@ -22,8 +26,18 @@ export default function TestGuideModal({ open, onClose, onStart }: Props) {
   ] as const
 
   const handleSkip = () => {
-    onClose()
-    navigate('/home')
+    const ok = window.confirm(
+      '체력 측정을 건너뛰면 건강 정보를 기반으로 운동 루틴이 생성됩니다.\n계속하시겠습니까?',
+    )
+    if (!ok) return
+
+    generateRoutine(undefined, {
+      onSuccess: (message) => {
+        alert(message)
+        onClose()
+        navigate('/home')
+      },
+    })
   }
 
   return (
@@ -47,13 +61,22 @@ export default function TestGuideModal({ open, onClose, onStart }: Props) {
             type='button'
             onClick={handleSkip}
             className='text-[13px] font-medium text-[#888888] hover:text-black hover:underline underline-offset-3 decoration-1 cursor-pointer'
+            disabled={isPending}
           >
-            건너뛰기 &gt;
+            {isPending ? (
+              <span className='flex items-center gap-1'>
+                <Loader2 className='h-4 w-4 animate-spin' />
+                생성중...
+              </span>
+            ) : (
+              <>건너뛰기 &gt;</>
+            )}
           </button>
           <button
             type='button'
             onClick={onStart}
             className='px-5 py-2 rounded-[10px] font-medium text-[13px] text-white bg-[#468FAF] cursor-pointer'
+            disabled={isPending}
           >
             체력 측정 시작
           </button>

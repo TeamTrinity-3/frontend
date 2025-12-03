@@ -54,7 +54,7 @@ export default function FitnessTestLoading() {
           navigate('/fitness/test/result', { state: data })
         },
       })
-    }, 5000)
+    }, 3000)
 
     return () => clearTimeout(timeout)
   }, [healthInfo, isLoading, navigate, postDashboard])

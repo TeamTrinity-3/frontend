@@ -26,6 +26,8 @@ function HomeContent() {
   const { data: healthInfo, isLoading, isFetching } = useHealthInfo() // 건강 정보 조회
   const { data: user } = useUserProfile() // 이름, 프로필 조회
 
+  const [keyword, setKeyword] = useState('') // 검색어 상태
+
   // 구글 로그인 후 건강 정보가 없으면 입력 페이지로 이동
   useEffect(() => {
     if (isLoading || isFetching) return
@@ -114,8 +116,8 @@ function HomeContent() {
 
           {/* 검색 */}
           <div className='max-[840px]:hidden'>
-            <SearchBar />
-            <SearchCategory />
+            <SearchBar keyword={keyword} setKeyword={setKeyword} />
+            <SearchCategory setKeyword={setKeyword} />
             <Recommend />
           </div>
         </main>
@@ -126,8 +128,8 @@ function HomeContent() {
           <TodayRoutine />
 
           <div className='hidden max-[840px]:block mt-8 max-[490px]:mt-5'>
-            <SearchBar />
-            <SearchCategory />
+            <SearchBar keyword={keyword} setKeyword={setKeyword} />
+            <SearchCategory setKeyword={setKeyword} />
             <Recommend />
           </div>
         </aside>

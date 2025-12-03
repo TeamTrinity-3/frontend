@@ -122,7 +122,16 @@ function MyPageContent() {
             <h3 className={s.sub_title}>{userName} 님의 체력 진단 보드</h3>
             <FitnessBoard />
             <div className='mt-4 flex justify-end'>
-              <button type='button' onClick={() => navigate('/fitness/test')} className={s.btn}>
+              <button
+                type='button'
+                onClick={() => {
+                  const ok = window.confirm(
+                    '체력 재측정을 하면 모든 진행 현황이 초기화되고 Day1부터 시작합니다.\n정말 다시 측정하시겠습니까?',
+                  )
+                  if (ok) navigate('/fitness/test')
+                }}
+                className={s.btn}
+              >
                 체력 재측정
               </button>
             </div>

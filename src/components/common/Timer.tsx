@@ -20,7 +20,7 @@ export default function Timer({
   onComplete,
   className = '',
 }: TimerProps) {
-  const totalMs = Math.max(0, Math.floor(totalSec * 1000)) // s -> ms
+  const totalMs = Math.max(0, Math.floor(totalSec * 1000)) // s >> ms
   const [leftMs, setLeftMs] = useState<number>(totalMs) // 남은 시간(ms)
   const [snap, setSnap] = useState(false) // 리셋 프레임에 transition 끄기
 
@@ -166,18 +166,6 @@ export default function Timer({
           </div>
         </div>
       </div>
-
-      {/* 내장 측정 시작 버튼 */}
-      {/* <button
-        type='button'
-        onClick={handleStart}
-        disabled={isCounting}
-        className={`mt-6 h-10 px-6 rounded-[10px] text-white transition-colors cursor-pointer
-          ${isCounting ? 'bg-[#888888] cursor-not-allowed' : 'bg-[#FF0000] hover:bg-[#E60000]'}
-        `}
-      >
-        측정 시작
-      </button> */}
     </>
   )
 }

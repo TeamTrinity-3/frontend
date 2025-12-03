@@ -1,23 +1,42 @@
 import { Clock } from 'lucide-react'
+import { useRecommendExercises } from '@/hooks/user/useRecommendExercises'
+import { useExerciseDetail } from '@/hooks/routine/useExerciseDetail'
+
+// 총 소요시간 계산
+function calcTotalSec(durationSec: number, sets: number, restSec: number) {
+  const safeSets = sets || 1
+  const safeDuration = durationSec || 0
+  const safeRest = restSec || 0
+  return safeDuration * safeSets + safeRest * Math.max(safeSets - 1, 0)
+}
+
+// 초 >> mm:ss
+function formatTime(totalSec: number) {
+  const min = Math.floor(totalSec / 60)
+  const sec = totalSec % 60
+  return `${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}`
+}
 
 export default function Recommend() {
-  // 더미 데이터
+  const { data: exerciseIds } = useRecommendExercises()
+
+  const id1 = exerciseIds?.[0]
+  const id2 = exerciseIds?.[1]
+  const id3 = exerciseIds?.[2]
+
+  // 운동 상세 정보 훅을 3번 호출
+  const { data: ex1 } = useExerciseDetail(id1)
+  const { data: ex2 } = useExerciseDetail(id2)
+  const { data: ex3 } = useExerciseDetail(id3)
+
+  if (!id1 || !id2 || !id3 || !ex1 || !ex2 || !ex3) {
+    return null
+  }
+
   const cards = [
-    {
-      title: '플랭크',
-      time: '05:00',
-      desc: '플랭크는 코어 근육을 강화하고 전신의 균형과 자세를 개선하는데 효과적입니다.',
-    },
-    {
-      title: '윗몸 일으키기',
-      time: '03:30',
-      desc: '복근 강화와 코어 안정성 향상에 효과적이지만, 허리 건강에는 주의가 필요합니다.',
-    },
-    {
-      title: '스쿼트',
-      time: '08:00',
-      desc: '스쿼트는 하체 근력 강화, 코어 활성화, 전신 체력 향상에 효과적이지만, 무릎이 약하거나 관절염이 있다면 주의해주세요.',
-    },
+    { id: id1, detail: ex1 },
+    { id: id2, detail: ex2 },
+    { id: id3, detail: ex3 },
   ]
 
   return (
@@ -27,26 +46,41 @@ export default function Recommend() {
       </h3>
 
       <div className='grid gap-7 max-[490px]:gap-5 grid-cols-3 max-[1024px]:grid-cols-2 max-[640px]:grid-cols-1'>
-        {cards.map((c, i) => (
-          <article
-            key={i}
-            className='overflow-hidden rounded-[10px] border border-black/5 bg-white'
-          >
-            {/* 이미지 자리 */}
-            <div className='relative w-full bg-[#ECEFF3] aspect-[16/9]' />
+        {cards.map(({ id, detail }) => {
+          const { exerciseName, intro, image, durationSec, sets, restSec } = detail
+          const totalSec = calcTotalSec(durationSec, sets, restSec)
+          const timeLabel = formatTime(totalSec)
 
-            {/* 내용 */}
-            <div className='p-3'>
-              <div className='text-[13px] font-semibold'>{c.title}</div>
-              <p className='mt-1 line-clamp-2 text-[12px] text-[#7B7B7B]'>{c.desc}</p>
-
-              <div className='mt-3 flex items-center gap-2 text-[12px] font-semibold'>
-                <Clock size={14} />
-                <span>{c.time}</span>
+          return (
+            <article
+              key={id}
+              className='overflow-hidden rounded-[10px] border border-black/5 bg-white cursor-pointer'
+              onClick={() => (window.location.href = `/routine/single/${id}`)}
+            >
+              {/* 이미지 */}
+              <div className='relative w-full bg-[#ECEFF3] aspect-[16/9]'>
+                {image && (
+                  <img
+                    src={image}
+                    alt={exerciseName}
+                    className='absolute inset-0 h-full w-full object-cover'
+                  />
+                )}
               </div>
-            </div>
-          </article>
-        ))}
+
+              {/* 내용 */}
+              <div className='p-3'>
+                <div className='text-[13px] font-semibold'>{exerciseName}</div>
+                <p className='mt-1 line-clamp-2 text-[12px] text-[#7B7B7B]'>{intro}</p>
+
+                <div className='mt-3 flex items-center gap-2 text-[12px] font-semibold'>
+                  <Clock size={14} />
+                  <span>{timeLabel}</span>
+                </div>
+              </div>
+            </article>
+          )
+        })}
       </div>
     </section>
   )

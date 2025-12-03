@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { s } from './StepProfile.styles'
+import { Loader2 } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar'
@@ -8,7 +9,7 @@ import AppSidebar from '@/components/layout/AppSidebar'
 import TermsAgreement from '@/components/layout/TermsAgreement'
 import step1 from '@/assets/progress/step1.svg'
 import { useRequestEmailAuth } from '@/hooks/auth/useRequestEmailAuth'
-import { useSignupUser } from '@/hooks/signup/useSignupUser'
+import { useSignupUser } from '@/hooks/auth/useSignupUser'
 import { useLoginUser } from '@/hooks/auth/useLoginUser'
 
 export default function StepProfile() {
@@ -20,7 +21,7 @@ export default function StepProfile() {
   const [sentCode, setSentCode] = useState<string | null>(null) // 발송된 인증코드
   const [agreeAll, setAgreeAll] = useState(false) // 약관 전체 동의 여부
 
-  const { mutate: requestAuthCode } = useRequestEmailAuth()
+  const { mutate: requestAuthCode, isPending } = useRequestEmailAuth()
   const { mutate: signupUser } = useSignupUser()
   const { mutate: login } = useLoginUser()
 
@@ -135,8 +136,20 @@ export default function StepProfile() {
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder='예) mofitrinity@gmail.com'
                       />
-                      <Button className={s.btn} type='button' onClick={handleEmailVerification}>
-                        인증하기
+                      <Button
+                        className={s.btn}
+                        type='button'
+                        onClick={handleEmailVerification}
+                        disabled={isPending}
+                      >
+                        {isPending ? (
+                          <span className='flex items-center gap-2'>
+                            <Loader2 className='animate-spin size-4' />
+                            전송중...
+                          </span>
+                        ) : (
+                          '인증하기'
+                        )}
                       </Button>
                     </div>
 

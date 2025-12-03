@@ -148,6 +148,7 @@ export default function EditHealthIssue() {
                       </p>
                       <Checklist
                         multiple
+                        value={restrictAreas}
                         onChange={(values) => setRestrictAreas(values)}
                         options={[
                           { id: '목', label: '목' },
