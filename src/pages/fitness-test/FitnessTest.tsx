@@ -20,15 +20,15 @@ import {
 } from '@/utils/fitnessTestTTS'
 
 const STEPS: FitnessStep[] = [
-  { label: '플랭크', time: '00:05' },
-  { label: '의자 앉았다 일어나기', time: '00:05' },
-  { label: '푸쉬업', time: '00:05' },
-  { label: 'Step 테스트', time: '00:05' },
+  { label: '플랭크', time: '03:00' },
+  { label: '의자 앉았다 일어나기', time: '00:30' },
+  { label: '푸쉬업', time: '01:00' },
+  { label: 'Step 테스트', time: '01:00' },
   { label: '허리 숙여 손끝 닿기', time: '00:00' },
-  { label: '눈 감고 한 발 서기', time: '00:05' },
+  { label: '눈 감고 한 발 서기', time: '02:00' },
 ]
 
-// 문자열 -> second 변환
+// 문자열 >> second 변환
 const timeToSec = (t: string) => {
   const [m, s] = t.split(':').map(Number)
   return (m || 0) * 60 + (s || 0)

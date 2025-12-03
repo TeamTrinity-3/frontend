@@ -4,7 +4,7 @@ import { api } from './api'
 // 이메일 중복 확인
 export const checkEmailExists = async (email: string): Promise<boolean> => {
   const response = await api.post('/login', { loginId: email })
-  return response.data.data.available // true 가입 X, false 가입 O
+  return response.data.data.available
 }
 
 // 이메일 인증
@@ -33,10 +33,19 @@ export const loginUser = async (email: string, password: string) => {
   }
 }
 
+// 로컬 회원가입 (이메일, 비밀번호, 이름)
+export const signupUser = async (email: string, password: string, name: string) => {
+  await api.post('/login/join', {
+    loginId: email,
+    password,
+    name,
+  })
+}
+
 // 로컬로 회원가입했는지 확인
 export const getEmailProvider = async (email: string): Promise<string | null> => {
   const response = await api.post('/login', { loginId: email })
-  return response.data.data.provider // "local" | "SNS" | null
+  return response.data.data.provider // local | SNS | null
 }
 
 // 비밀번호 변경
@@ -45,4 +54,9 @@ export const patchPassword = async (email: string, password: string) => {
     loginId: email,
     password,
   })
+}
+
+// 회원탈퇴
+export const deleteUser = async (): Promise<void> => {
+  await api.delete('/user/delete')
 }

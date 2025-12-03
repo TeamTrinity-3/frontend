@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { RefreshCw, Clock } from 'lucide-react'
+import { RefreshCw, Clock, Loader2 } from 'lucide-react'
 import RoutineGuideModal from '@/components/common/RoutineGuideModal'
 import { useWeekPlan } from '@/hooks/user/useWeekPlan'
 import { useTodayRoutine } from '@/hooks/user/useTodayRoutine'
+import { useGenerateRoutine } from '@/hooks/routine/useGenerateRoutine'
 
 // listResponses 타입
 type ExerciseItem = {
@@ -35,13 +36,28 @@ export default function TodayRoutine() {
   const { data: weekPlan } = useWeekPlan()
   const planId = weekPlan?.plans?.[weekPlan.currentDay - 1]?.planId
 
-  // 오늘의 루틴 불러오기
-  const { data: todayRoutine } = useTodayRoutine(planId)
-  if (!todayRoutine) return null
+  const { data: todayRoutine } = useTodayRoutine(planId) // 오늘의 루틴 불러오기
+  const { mutate: generateRoutine, isPending } = useGenerateRoutine() // 7일치 루틴 재생성
+
+  if (!planId || !todayRoutine) return null
 
   const { image, title, description, routineSec, listResponses: rawList } = todayRoutine
   const listResponses = (rawList ?? []) as ExerciseItem[]
   const durationText = formatDuration(routineSec)
+
+  const handleGenerate = () => {
+    const ok = window.confirm(
+      '루틴을 다시 생성하면 모든 진행 현황이 초기화되고 Day1부터 시작합니다.\n정말 다시 생성하시겠습니까?',
+    )
+    if (!ok) return
+
+    generateRoutine(undefined, {
+      onSuccess: (message) => {
+        alert(message)
+        window.location.reload()
+      },
+    })
+  }
 
   return (
     <>
@@ -53,18 +69,19 @@ export default function TodayRoutine() {
             type='button'
             aria-label='refresh routines'
             className='cursor-pointer'
-            onClick={() => window.location.reload()}
+            onClick={handleGenerate}
+            disabled={isPending}
           >
-            <RefreshCw size={16} />
+            {isPending ? <Loader2 size={16} className='animate-spin' /> : <RefreshCw size={16} />}
           </button>
         </div>
 
-        {/* 이미지 자리, h는 이미지 비율대로 되도록 수정*/}
+        {/* 이미지 */}
         <div className='h-36 max-[840px]:h-80 max-[600px]:h-36 w-full rounded-[10px] bg-[#ECEFF3] mb-4 overflow-hidden'>
           {image && <img src={image} alt={title} className='h-full w-full object-cover' />}
         </div>
 
-        {/* 텍스트/아이콘 오버레이 */}
+        {/* 텍스트 / 아이콘 오버레이 */}
         <div className='text-[14px] font-semibold'>{title}</div>
         <div className='mt-1 text-[12px] text-[#7B7B7B]'>{description}</div>
         <div className='mt-3 ml-1 flex items-center gap-2 text-[12px] font-semibold'>
@@ -115,7 +132,7 @@ export default function TodayRoutine() {
         onClose={() => setOpenGuide(false)}
         onStart={() => {
           setOpenGuide(false)
-          navigate('/routine/today')
+          navigate(`/routine/today/${planId}`)
         }}
       />
     </>

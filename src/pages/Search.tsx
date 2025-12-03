@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useLocation } from 'react-router-dom'
 import { TextAlignJustify } from 'lucide-react'
 import { s } from './Search.styles'
 import { SidebarProvider, SidebarInset, useSidebar } from '@/components/ui/sidebar'
@@ -13,6 +14,13 @@ import { useUserProfile } from '@/hooks/user/useUserProfile'
 import defaultProfile from '@/assets/Images/profile.svg'
 
 function SearchContent() {
+  const { search } = useLocation()
+  const params = new URLSearchParams(search)
+  const urlKeyword = params.get('keyword') || '' // url에서 가져온 검색어
+  const targetArea = params.get('targetArea') // FULL_BODY 같은 값 또는 null
+
+  const [keyword, setKeyword] = useState(urlKeyword) // 검색어 상태
+
   const [sideOpen, setSideOpen] = useState(false)
   const { setOpenMobile } = useSidebar()
 
@@ -21,6 +29,11 @@ function SearchContent() {
 
   const { data: user } = useUserProfile() // 이름, 프로필 조회
   const profileSrc = user?.picture ?? defaultProfile // 프로필 없으면 기본 이미지
+
+  // url이 바뀔 때 마다 keyword를 동기화
+  useEffect(() => {
+    setKeyword(urlKeyword)
+  }, [urlKeyword])
 
   const openSidebar = () => {
     if (isLt768) {
@@ -86,9 +99,9 @@ function SearchContent() {
 
           {/* 검색 */}
           <div className='max-[840px]:hidden'>
-            <SearchBar />
-            <SearchCategory />
-            <SearchResult />
+            <SearchBar keyword={keyword} setKeyword={setKeyword} />
+            <SearchCategory setKeyword={setKeyword} />
+            <SearchResult targetArea={targetArea} keyword={urlKeyword} pageSize={12} />
           </div>
         </main>
 
@@ -100,8 +113,8 @@ function SearchContent() {
           </div>
 
           <div className='hidden max-[840px]:block max-[490px]:-mt-2'>
-            <SearchBar />
-            <SearchResult />
+            <SearchBar keyword={keyword} setKeyword={setKeyword} />
+            <SearchResult targetArea={targetArea} keyword={urlKeyword} pageSize={12} />
             <div>
               <h3
                 className='hidden max-[840px]:block -mt-2 -mb-4 text-[15px] font-semibold 
@@ -109,7 +122,7 @@ function SearchContent() {
               >
                 Category
               </h3>
-              <SearchCategory />
+              <SearchCategory setKeyword={setKeyword} />
             </div>
           </div>
         </aside>

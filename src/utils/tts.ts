@@ -8,7 +8,7 @@ const loadVoices = () => {
 
 speechSynthesis.onvoiceschanged = loadVoices
 
-export const speak = (text: string) => {
+export const speak = (text: string, onEnd?: () => void) => {
   if (typeof window === 'undefined') return
 
   const utter = new SpeechSynthesisUtterance(text)
@@ -16,6 +16,16 @@ export const speak = (text: string) => {
   utter.voice = selectedVoice
   utter.rate = 0.95
   utter.pitch = 1
+
+  if (onEnd) {
+    utter.onend = onEnd
+  }
+
   window.speechSynthesis.cancel()
   window.speechSynthesis.speak(utter)
+}
+
+export const stopSpeak = () => {
+  if (typeof window === 'undefined') return
+  window.speechSynthesis.cancel()
 }

@@ -15,7 +15,7 @@ export interface HealthInfo {
 // 건강 정보 조회
 export const getHealthInfo = async (): Promise<HealthInfo | null> => {
   const response = await api.get('/health/get')
-  return response.data.data // 있으면 객체, 없으면 null
+  return response.data.data
 }
 
 // 건강 정보 입력

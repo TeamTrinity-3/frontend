@@ -1,17 +1,43 @@
 import { useNavigate } from 'react-router-dom'
 import Modal from '@/components/common/Modal'
+import { usePatchPlanProgress } from '@/hooks/routine/usePatchPlanProgress'
 
 type Props = {
   open: boolean
   onClose: () => void
+  planId?: number
 }
 
-export default function TestGuideModal({ open, onClose }: Props) {
+export default function RoutineCompleteModal({ open, onClose, planId }: Props) {
   const navigate = useNavigate()
+  const { mutate: patchPlan } = usePatchPlanProgress()
 
   const handleCheck = () => {
     onClose()
-    navigate('/home')
+
+    // 싱글모드면 api 호출 안함
+    if (!planId) {
+      navigate('/home')
+      return
+    }
+
+    // 운동 완료 후 상태 patch
+    patchPlan(planId, {
+      onSuccess: () => {
+        navigate('/home')
+      },
+      onError: (err: any) => {
+        const status = err.response?.data?.status
+        if (status === 409) {
+          alert('이미 완료한 운동입니다.')
+        } else if (status === 403) {
+          alert('오늘의 운동 일정이 아닙니다.')
+        } else {
+          alert('처리 중 오류가 발생했습니다.')
+        }
+        navigate('/home')
+      },
+    })
   }
 
   return (
@@ -26,7 +52,7 @@ export default function TestGuideModal({ open, onClose }: Props) {
         <h3 className='mt-4 text-base md:text-lg font-semibold'>운동이 끝났어요!🥳</h3>
 
         <p className='mt-2 leading-5 text-center text-[13px] md:text-[14px] text-[#7B7B7B] font-medium'>
-          코어 및 민첩성이 향상되었어요!
+          어제보다 성장하셨네요!
           <br />
           내일 운동도 잊지 마세요😉
         </p>

@@ -20,7 +20,7 @@ export default function Login() {
   const [showPw, setShowPw] = useState(false)
   const login = useLoginUser()
 
-  // 일반 로그인
+  // 로컬 로그인
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault()
 

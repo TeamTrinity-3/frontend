@@ -5,6 +5,7 @@ import { s } from './Settings.styles'
 import { SidebarProvider, SidebarInset, useSidebar } from '@/components/ui/sidebar'
 import AppSidebar from '@/components/layout/AppSidebar'
 import { useBreakpoint } from '@/hooks/useBreakpoint'
+import { useDeleteUser } from '@/hooks/auth/useDeleteUser'
 
 function SettingsContent() {
   const navigate = useNavigate()
@@ -14,6 +15,8 @@ function SettingsContent() {
 
   const isLt768 = useBreakpoint('(max-width: 767px)')
   const isLt1400 = useBreakpoint('(max-width: 1400px)')
+
+  const { mutate: deleteUser } = useDeleteUser()
 
   const openSidebar = () => {
     if (isLt768) {
@@ -26,6 +29,34 @@ function SettingsContent() {
   const closeSidebar = () => {
     if (isLt768) setOpenMobile?.(false)
     setSideOpen(false)
+  }
+
+  // 회원탈퇴
+  const handleDeleteAccount = () => {
+    if (
+      !window.confirm(
+        '정말로 회원 탈퇴하시겠습니까?\n탈퇴 시 모든 정보가 삭제되며, 복구가 불가능합니다.',
+      )
+    ) {
+      return
+    }
+
+    deleteUser(undefined, {
+      onSuccess: () => {
+        localStorage.removeItem('token')
+        alert('회원 탈퇴가 완료되었습니다.')
+        navigate('/', { replace: true })
+      },
+      onError: () => {
+        alert('회원 탈퇴 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.')
+      },
+    })
+  }
+
+  // 로그아웃
+  const handleLogout = () => {
+    localStorage.removeItem('token')
+    navigate('/', { replace: true })
   }
 
   return (
@@ -86,23 +117,11 @@ function SettingsContent() {
 
               {/* 회원탈퇴, 로그아웃 */}
               <div className='mt-auto flex items-center justify-center gap-7 px-5 py-10 text-[12px] font-medium'>
-                <button
-                  type='button'
-                  onClick={() => {
-                    if (
-                      window.confirm(
-                        '정말로 회원 탈퇴하시겠습니까?\n탈퇴 시 모든 정보가 삭제됩니다.',
-                      )
-                    ) {
-                      navigate('/')
-                    }
-                  }}
-                  className='cursor-pointer'
-                >
+                <button type='button' onClick={handleDeleteAccount} className='cursor-pointer'>
                   회원탈퇴
                 </button>
                 <span className='w-px h-4 bg-black/10' />
-                <button type='button' onClick={() => navigate('/')} className='cursor-pointer'>
+                <button type='button' onClick={handleLogout} className='cursor-pointer'>
                   로그아웃
                 </button>
               </div>
