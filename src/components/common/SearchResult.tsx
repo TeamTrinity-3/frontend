@@ -8,6 +8,7 @@ type SearchResultProps = {
   targetArea?: string | null // FULL_BODY 같은 것, 없으면 전체 검색
   keyword?: string // 검색바에서 온 검색어 (없으면 카테고리)
   pageSize?: number // 기본 12, 화면에 따라 조절 가능
+  onPageChange?: () => void // 스크롤 상단으로 보내기
 }
 
 // targetArea 매핑
@@ -31,21 +32,38 @@ const formatTime = (totalSec: number) => {
   return `${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}`
 }
 
-export default function SearchResult({ targetArea, keyword, pageSize = 12 }: SearchResultProps) {
+export default function SearchResult({
+  targetArea,
+  keyword,
+  pageSize = 12,
+  onPageChange,
+}: SearchResultProps) {
   const trimmed = (keyword ?? '').trim()
   // 카테고리 모드
   if (targetArea) {
-    return <CategorySearchResult targetArea={targetArea} pageSize={pageSize} />
+    return (
+      <CategorySearchResult
+        targetArea={targetArea}
+        pageSize={pageSize}
+        onPageChange={onPageChange}
+      />
+    )
   }
   // 검색어가 카테고리인 경우
   if (trimmed && trimmed in CATEGORY_KEYWORD_MAP) {
     const mappedTargetArea = CATEGORY_KEYWORD_MAP[trimmed] // null이면 전체
 
-    return <CategorySearchResult targetArea={mappedTargetArea} pageSize={pageSize} />
+    return (
+      <CategorySearchResult
+        targetArea={mappedTargetArea}
+        pageSize={pageSize}
+        onPageChange={onPageChange}
+      />
+    )
   }
   // 검색어 모드
   if (trimmed.length > 0) {
-    return <KeywordSearchResult keyword={trimmed} pageSize={pageSize} />
+    return <KeywordSearchResult keyword={trimmed} pageSize={pageSize} onPageChange={onPageChange} />
   }
   return null
 }
@@ -54,9 +72,11 @@ export default function SearchResult({ targetArea, keyword, pageSize = 12 }: Sea
 function CategorySearchResult({
   targetArea,
   pageSize,
+  onPageChange,
 }: {
   targetArea: string | null | undefined
   pageSize: number
+  onPageChange?: () => void
 }) {
   const navigate = useNavigate()
   const [page, setPage] = useState(0)
@@ -65,6 +85,11 @@ function CategorySearchResult({
   useEffect(() => {
     setPage(0)
   }, [targetArea])
+
+  // page가 바뀌면 상단 스크롤
+  useEffect(() => {
+    onPageChange?.()
+  }, [page, onPageChange])
 
   const { data } = useExerciseList({
     targetArea: targetArea || undefined, // 전체 검색이면 undefined
@@ -135,7 +160,15 @@ function CategorySearchResult({
 }
 
 // 검색어 모드
-function KeywordSearchResult({ keyword, pageSize }: { keyword: string; pageSize: number }) {
+function KeywordSearchResult({
+  keyword,
+  pageSize,
+  onPageChange,
+}: {
+  keyword: string
+  pageSize: number
+  onPageChange?: () => void
+}) {
   const navigate = useNavigate()
   const [page, setPage] = useState(0)
 
@@ -143,6 +176,11 @@ function KeywordSearchResult({ keyword, pageSize }: { keyword: string; pageSize:
   useEffect(() => {
     setPage(0)
   }, [keyword])
+
+  // page가 바뀌면 상단 스크롤
+  useEffect(() => {
+    onPageChange?.()
+  }, [page, onPageChange])
 
   const { data } = useExerciseSearch(keyword, page, pageSize)
 

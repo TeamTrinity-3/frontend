@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useLocation } from 'react-router-dom'
 import { TextAlignJustify } from 'lucide-react'
 import { s } from './Search.styles'
@@ -30,10 +30,30 @@ function SearchContent() {
   const { data: user } = useUserProfile() // 이름, 프로필 조회
   const profileSrc = user?.picture ?? defaultProfile // 프로필 없으면 기본 이미지
 
+  const layoutRef = useRef<HTMLDivElement | null>(null) // 스크롤 상단으로 보내주기
+
   // url이 바뀔 때 마다 keyword를 동기화
   useEffect(() => {
     setKeyword(urlKeyword)
   }, [urlKeyword])
+
+  // 쿼리스트링이 바뀔 때 상단으로 스크롤
+  useEffect(() => {
+    if (layoutRef.current) {
+      layoutRef.current.scrollTo({ top: 0, behavior: 'smooth' })
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+  }, [search])
+
+  // 페이지네이션에서 호출할 스크롤 함수
+  const scrollToTop = () => {
+    if (layoutRef.current) {
+      layoutRef.current.scrollTo({ top: 0, behavior: 'smooth' })
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+  }
 
   const openSidebar = () => {
     if (isLt768) {
@@ -79,7 +99,7 @@ function SearchContent() {
         )}
       </div>
 
-      <div className={s.layout}>
+      <div ref={layoutRef} className={s.layout}>
         {/* 가짜 사이드바 (공간 채우기용) */}
         <div className={s.fakeSidebar} />
 
@@ -101,12 +121,22 @@ function SearchContent() {
           <div className='max-[840px]:hidden'>
             <SearchBar keyword={keyword} setKeyword={setKeyword} />
             <SearchCategory setKeyword={setKeyword} />
-            <SearchResult targetArea={targetArea} keyword={urlKeyword} pageSize={12} />
+            <SearchResult
+              targetArea={targetArea}
+              keyword={urlKeyword}
+              pageSize={12}
+              onPageChange={scrollToTop}
+            />
           </div>
 
           <div className='hidden max-[840px]:block'>
             <SearchBar keyword={keyword} setKeyword={setKeyword} />
-            <SearchResult targetArea={targetArea} keyword={urlKeyword} pageSize={12} />
+            <SearchResult
+              targetArea={targetArea}
+              keyword={urlKeyword}
+              pageSize={12}
+              onPageChange={scrollToTop}
+            />
             <div>
               <h3
                 className='hidden max-[840px]:block max-[840px]:mt-5 -mt-2 -mb-4 text-[15px] font-semibold 
