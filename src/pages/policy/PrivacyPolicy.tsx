@@ -24,7 +24,7 @@ export default function PrivacyPolicy() {
         <section className='space-y-2'>
           <h3 className='font-medium'>1. 개인정보의 처리 목적</h3>
           <p>
-            (주)트리니티 (&lsquo;www.mofit.com&rsquo;이하 &lsquo;MoFit&rsquo;)는 다음의 목적을
+            (주)트리니티 (&lsquo;www.mefoweb.com&rsquo;이하 &lsquo;MoFit&rsquo;)는 다음의 목적을
             위하여 개인정보를 처리하고 있으며, 다음 목적 이외의 용도로는 이용하지 않습니다.
           </p>
           <ul className='list-disc list-inside space-y-1'>
